@@ -821,6 +821,18 @@ export default function Home() {
               </div>
             </div>
 
+            <div className="mobile-war-room">
+              <ProgressPanel
+                drafted={drafted.length}
+                score={score}
+                complete={isRosterComplete}
+                showProjection={showProjection}
+                onToggleProjection={() => setShowProjection((value) => !value)}
+                onReveal={() => setScreen("rating")}
+              />
+              <LiveLineup roster={roster} onClear={clearSlot} />
+            </div>
+
             <div className="list-heading">
               <span>{currentSpin ? "Available roster options" : "Player board preview"}</span>
               <strong>{currentSpin ? `${availablePlayers.length} players` : "Spin to unlock"}</strong>
