@@ -1157,23 +1157,66 @@ h3 {
 }
 
 @media (max-width: 720px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+
   .topbar {
-    align-items: stretch;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   .step-nav {
+    grid-column: 1 / -1;
     width: 100%;
+    gap: 4px;
+    padding: 4px;
+    scrollbar-width: none;
+  }
+
+  .step-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step-nav button,
+  .small-action {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .brand-mark {
+    width: fit-content;
+    padding: 8px 10px;
+    font-size: 1rem;
   }
 
   .small-action {
-    width: 100%;
+    justify-self: end;
+    width: fit-content;
   }
 
   .hero {
     align-items: start;
-    padding-top: 44px;
-    padding-bottom: 170px;
+    min-height: calc(100svh - 112px);
+    padding: 42px 18px 128px;
+  }
+
+  h1 {
+    font-size: clamp(5.5rem, 30vw, 8rem);
+  }
+
+  h2,
+  .section-heading.compact h2 {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+
+  .hero-copy {
+    font-size: 1.05rem;
+    line-height: 1.35;
   }
 
   .hero-actions,
@@ -1194,6 +1237,7 @@ h3 {
   .primary-cta,
   .secondary-cta {
     width: 100%;
+    min-height: 52px;
   }
 
   .instruction-list,
@@ -1201,6 +1245,211 @@ h3 {
   .system-grid,
   .layout-notes {
     grid-template-columns: 1fr;
+  }
+
+  .content-grid,
+  .draft-layout,
+  .roster-layout,
+  .rating-layout,
+  .system-screen {
+    width: min(100% - 20px, 520px);
+    padding: 20px 0 44px;
+  }
+
+  .section-heading.compact {
+    margin-bottom: 12px;
+  }
+
+  .section-heading.compact .muted {
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  .hero-scoreboard {
+    right: 18px;
+    bottom: 18px;
+    width: calc(100% - 36px);
+    padding: 14px;
+  }
+
+  .hero-scoreboard strong {
+    font-size: 2.35rem;
+  }
+
+  .spin-card {
+    gap: 16px;
+    padding: 16px;
+    margin: 14px 0 18px;
+  }
+
+  .spin-card strong {
+    font-size: clamp(1.65rem, 10vw, 2.3rem);
+    line-height: 0.98;
+  }
+
+  .reroll-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reroll-actions .secondary-cta {
+    min-height: 48px;
+    padding: 0 8px;
+    font-size: 0.78rem;
+    white-space: normal;
+  }
+
+  .list-heading {
+    margin-top: 6px;
+    font-size: 0.9rem;
+  }
+
+  .player-grid {
+    gap: 10px;
+  }
+
+  .player-card {
+    min-height: 222px;
+    padding: 14px;
+  }
+
+  .player-card::after {
+    inset: 7px;
+  }
+
+  .card-topline span:first-child {
+    padding: 7px 9px;
+    min-width: 38px;
+  }
+
+  .rating-badge {
+    min-width: 56px;
+    height: 30px;
+    font-size: 0.74rem;
+  }
+
+  .player-card h3 {
+    margin-top: 26px;
+    margin-bottom: 6px;
+    font-size: 1.28rem;
+    line-height: 1.04;
+  }
+
+  .player-card p {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .stat-strip {
+    min-height: 44px;
+    font-size: 0.85rem;
+    line-height: 1.25;
+  }
+
+  .draft-button {
+    min-height: 50px;
+  }
+
+  .draft-sidebar {
+    display: grid;
+    gap: 12px;
+  }
+
+  .progress-panel,
+  .live-lineup-card,
+  .rating-board,
+  .record-reveal {
+    padding: 14px;
+  }
+
+  .progress-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .progress-panel .rating-row {
+    margin-bottom: 0;
+  }
+
+  .mini-score {
+    margin: 0;
+    padding: 14px;
+  }
+
+  .mini-score strong {
+    font-size: 2.2rem;
+  }
+
+  .peek-button {
+    margin-bottom: 0;
+  }
+
+  .live-lineup-card {
+    margin-top: 0;
+  }
+
+  .mini-field {
+    min-height: 318px;
+    margin-top: 12px;
+  }
+
+  .mini-field::before {
+    font-size: 2.35rem;
+  }
+
+  .field-marker {
+    width: 48px;
+    height: 48px;
+    padding: 3px;
+  }
+
+  .field-marker span,
+  .field-marker small {
+    font-size: 0.54rem;
+  }
+
+  .field-marker strong {
+    font-size: 0.92rem;
+  }
+
+  .slot-0 {
+    left: calc(50% - 24px);
+    bottom: 18px;
+  }
+
+  .slot-1 {
+    left: calc(50% - 24px);
+    bottom: 76px;
+  }
+
+  .slot-2 {
+    left: 14px;
+    top: 88px;
+  }
+
+  .slot-3 {
+    right: 14px;
+    top: 88px;
+  }
+
+  .slot-4 {
+    left: calc(50% - 24px);
+    top: 84px;
+  }
+
+  .slot-5 {
+    left: calc(50% - 24px);
+    top: 18px;
+  }
+
+  .slot-6 {
+    right: 58px;
+    bottom: 132px;
+  }
+
+  .slot-7 {
+    right: 14px;
+    top: 18px;
   }
 
   .football-field {
@@ -1216,5 +1465,71 @@ h3 {
 
   .bench-player select {
     width: 100%;
+  }
+
+  .record-reveal {
+    min-height: 300px;
+  }
+
+  .record-reveal strong,
+  .results-screen > strong {
+    font-size: clamp(5rem, 28vw, 7rem);
+  }
+
+  .results-screen {
+    width: min(100% - 24px, 520px);
+    min-height: calc(100svh - 112px);
+    padding: 34px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .content-grid,
+  .draft-layout,
+  .roster-layout,
+  .rating-layout,
+  .system-screen {
+    width: calc(100% - 16px);
+  }
+
+  .step-nav button {
+    flex: 1 0 auto;
+  }
+
+  .spin-card strong {
+    font-size: clamp(1.45rem, 9vw, 2rem);
+  }
+
+  .reroll-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .mini-field {
+    min-height: 292px;
+  }
+
+  .field-marker {
+    width: 44px;
+    height: 44px;
+  }
+
+  .slot-0,
+  .slot-1,
+  .slot-4,
+  .slot-5 {
+    left: calc(50% - 22px);
+  }
+
+  .slot-2 {
+    left: 10px;
+  }
+
+  .slot-3,
+  .slot-7 {
+    right: 10px;
+  }
+
+  .slot-6 {
+    right: 48px;
   }
 }
