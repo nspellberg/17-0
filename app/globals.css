@@ -1165,8 +1165,8 @@ h3 {
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
+    gap: 6px;
+    padding: 8px 10px;
   }
 
   .step-nav {
@@ -1183,15 +1183,15 @@ h3 {
 
   .step-nav button,
   .small-action {
-    min-height: 38px;
-    padding: 8px 10px;
-    font-size: 0.82rem;
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 0.76rem;
   }
 
   .brand-mark {
     width: fit-content;
-    padding: 8px 10px;
-    font-size: 1rem;
+    padding: 6px 9px;
+    font-size: 0.95rem;
   }
 
   .small-action {
@@ -1201,22 +1201,22 @@ h3 {
 
   .hero {
     align-items: start;
-    min-height: calc(100svh - 112px);
-    padding: 42px 18px 128px;
+    min-height: auto;
+    padding: 24px 14px 20px;
   }
 
   h1 {
-    font-size: clamp(5.5rem, 30vw, 8rem);
+    font-size: clamp(4rem, 22vw, 5.8rem);
   }
 
   h2,
   .section-heading.compact h2 {
-    font-size: clamp(2rem, 12vw, 3rem);
+    font-size: clamp(1.7rem, 8vw, 2.35rem);
   }
 
   .hero-copy {
-    font-size: 1.05rem;
-    line-height: 1.35;
+    font-size: 0.98rem;
+    line-height: 1.3;
   }
 
   .hero-actions,
@@ -1237,14 +1237,17 @@ h3 {
   .primary-cta,
   .secondary-cta {
     width: 100%;
-    min-height: 52px;
+    min-height: 44px;
   }
 
   .instruction-list,
-  .player-grid,
   .system-grid,
   .layout-notes {
     grid-template-columns: 1fr;
+  }
+
+  .player-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .content-grid,
@@ -1252,8 +1255,8 @@ h3 {
   .roster-layout,
   .rating-layout,
   .system-screen {
-    width: min(100% - 20px, 520px);
-    padding: 20px 0 44px;
+    width: min(100% - 14px, 520px);
+    padding: 12px 0 28px;
   }
 
   .section-heading.compact {
@@ -1261,29 +1264,29 @@ h3 {
   }
 
   .section-heading.compact .muted {
-    font-size: 0.92rem;
-    line-height: 1.35;
+    font-size: 0.84rem;
+    line-height: 1.28;
   }
 
   .hero-scoreboard {
-    right: 18px;
-    bottom: 18px;
-    width: calc(100% - 36px);
-    padding: 14px;
+    position: static;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
   }
 
   .hero-scoreboard strong {
-    font-size: 2.35rem;
+    font-size: 2rem;
   }
 
   .spin-card {
-    gap: 16px;
-    padding: 16px;
-    margin: 14px 0 18px;
+    gap: 10px;
+    padding: 12px;
+    margin: 10px 0 12px;
   }
 
   .spin-card strong {
-    font-size: clamp(1.65rem, 10vw, 2.3rem);
+    font-size: clamp(1.25rem, 7vw, 1.8rem);
     line-height: 0.98;
   }
 
@@ -1292,61 +1295,66 @@ h3 {
   }
 
   .reroll-actions .secondary-cta {
-    min-height: 48px;
-    padding: 0 8px;
-    font-size: 0.78rem;
+    min-height: 40px;
+    padding: 0 6px;
+    font-size: 0.7rem;
     white-space: normal;
   }
 
   .list-heading {
-    margin-top: 6px;
-    font-size: 0.9rem;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    font-size: 0.82rem;
   }
 
   .player-grid {
-    gap: 10px;
+    gap: 8px;
   }
 
   .player-card {
-    min-height: 222px;
-    padding: 14px;
+    min-height: 168px;
+    padding: 10px;
   }
 
   .player-card::after {
-    inset: 7px;
+    inset: 5px;
   }
 
   .card-topline span:first-child {
-    padding: 7px 9px;
-    min-width: 38px;
+    padding: 5px 7px;
+    min-width: 32px;
+    font-size: 0.78rem;
   }
 
   .rating-badge {
-    min-width: 56px;
-    height: 30px;
-    font-size: 0.74rem;
+    min-width: 46px;
+    height: 26px;
+    font-size: 0.66rem;
   }
 
   .player-card h3 {
-    margin-top: 26px;
-    margin-bottom: 6px;
-    font-size: 1.28rem;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    font-size: 0.98rem;
     line-height: 1.04;
   }
 
   .player-card p {
-    margin-bottom: 10px;
-    font-size: 0.95rem;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    line-height: 1.2;
   }
 
   .stat-strip {
-    min-height: 44px;
-    font-size: 0.85rem;
-    line-height: 1.25;
+    min-height: 32px;
+    font-size: 0.68rem;
+    line-height: 1.15;
   }
 
   .draft-button {
-    min-height: 50px;
+    min-height: 38px;
+    padding: 0 8px;
+    font-size: 0.78rem;
   }
 
   .draft-sidebar {
@@ -1358,7 +1366,7 @@ h3 {
   .live-lineup-card,
   .rating-board,
   .record-reveal {
-    padding: 14px;
+    padding: 12px;
   }
 
   .progress-panel {
@@ -1373,11 +1381,11 @@ h3 {
 
   .mini-score {
     margin: 0;
-    padding: 14px;
+    padding: 10px;
   }
 
   .mini-score strong {
-    font-size: 2.2rem;
+    font-size: 1.65rem;
   }
 
   .peek-button {
@@ -1389,67 +1397,67 @@ h3 {
   }
 
   .mini-field {
-    min-height: 318px;
-    margin-top: 12px;
+    min-height: 230px;
+    margin-top: 10px;
   }
 
   .mini-field::before {
-    font-size: 2.35rem;
+    font-size: 1.7rem;
   }
 
   .field-marker {
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
     padding: 3px;
   }
 
   .field-marker span,
   .field-marker small {
-    font-size: 0.54rem;
+    font-size: 0.48rem;
   }
 
   .field-marker strong {
-    font-size: 0.92rem;
+    font-size: 0.76rem;
   }
 
   .slot-0 {
-    left: calc(50% - 24px);
-    bottom: 18px;
+    left: calc(50% - 19px);
+    bottom: 12px;
   }
 
   .slot-1 {
-    left: calc(50% - 24px);
-    bottom: 76px;
+    left: calc(50% - 19px);
+    bottom: 58px;
   }
 
   .slot-2 {
-    left: 14px;
-    top: 88px;
+    left: 10px;
+    top: 66px;
   }
 
   .slot-3 {
-    right: 14px;
-    top: 88px;
+    right: 10px;
+    top: 66px;
   }
 
   .slot-4 {
-    left: calc(50% - 24px);
-    top: 84px;
+    left: calc(50% - 19px);
+    top: 64px;
   }
 
   .slot-5 {
-    left: calc(50% - 24px);
-    top: 18px;
+    left: calc(50% - 19px);
+    top: 12px;
   }
 
   .slot-6 {
-    right: 58px;
-    bottom: 132px;
+    right: 48px;
+    bottom: 96px;
   }
 
   .slot-7 {
-    right: 14px;
-    top: 18px;
+    right: 10px;
+    top: 12px;
   }
 
   .football-field {
@@ -1468,18 +1476,18 @@ h3 {
   }
 
   .record-reveal {
-    min-height: 300px;
+    min-height: 220px;
   }
 
   .record-reveal strong,
   .results-screen > strong {
-    font-size: clamp(5rem, 28vw, 7rem);
+    font-size: clamp(4rem, 20vw, 5.5rem);
   }
 
   .results-screen {
-    width: min(100% - 24px, 520px);
-    min-height: calc(100svh - 112px);
-    padding: 34px 0;
+    width: min(100% - 16px, 520px);
+    min-height: auto;
+    padding: 20px 0;
   }
 }
 
@@ -1497,27 +1505,27 @@ h3 {
   }
 
   .spin-card strong {
-    font-size: clamp(1.45rem, 9vw, 2rem);
+    font-size: clamp(1.15rem, 6.8vw, 1.6rem);
   }
 
   .reroll-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .mini-field {
-    min-height: 292px;
+    min-height: 214px;
   }
 
   .field-marker {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
   }
 
   .slot-0,
   .slot-1,
   .slot-4,
   .slot-5 {
-    left: calc(50% - 22px);
+    left: calc(50% - 18px);
   }
 
   .slot-2 {
@@ -1530,6 +1538,6 @@ h3 {
   }
 
   .slot-6 {
-    right: 48px;
+    right: 42px;
   }
 }
