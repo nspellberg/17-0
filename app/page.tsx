@@ -1,0 +1,1065 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
+type Screen = "home" | "how" | "draft" | "rating" | "results" | "system";
+type Position = "QB" | "RB" | "WR" | "TE" | "OL" | "DL" | "LB" | "CB" | "S" | "FLEX" | "DEF";
+
+type Player = {
+  id: string;
+  name: string;
+  team: string;
+  decade: string;
+  position: Position;
+  stats: string;
+  rating: number;
+  offense: number;
+  defense: number;
+  star: number;
+  chemistry: number;
+};
+
+type Spin = {
+  team: string;
+  decade: string;
+};
+
+const offensePositions: Position[] = ["QB", "RB", "WR", "TE", "OL", "FLEX"];
+const rosterSlots: Position[] = ["QB", "RB", "WR", "WR", "TE", "OL", "FLEX", "DEF"];
+
+const baseSpinDeck: Spin[] = [
+  { team: "Dallas Cowboys", decade: "1990s" },
+  { team: "San Francisco 49ers", decade: "1980s" },
+  { team: "New England Patriots", decade: "2000s" },
+  { team: "Pittsburgh Steelers", decade: "1970s" },
+  { team: "Green Bay Packers", decade: "1960s" },
+  { team: "Chicago Bears", decade: "1980s" },
+  { team: "Baltimore Ravens", decade: "2000s" },
+  { team: "Indianapolis Colts", decade: "2000s" },
+  { team: "Miami Dolphins", decade: "1970s" },
+  { team: "Minnesota Vikings", decade: "1990s" },
+  { team: "Los Angeles Rams", decade: "2010s" },
+  { team: "Kansas City Chiefs", decade: "2020s" },
+  { team: "Detroit Lions", decade: "1990s" },
+  { team: "Las Vegas Raiders", decade: "1970s" }
+];
+
+const players: Player[] = [
+  { id: "aikman", name: "Troy Aikman", team: "Dallas Cowboys", decade: "1990s", position: "QB", stats: "3x champ, 6 Pro Bowls", rating: 92, offense: 94, defense: 40, star: 91, chemistry: 95 },
+  { id: "emmitt", name: "Emmitt Smith", team: "Dallas Cowboys", decade: "1990s", position: "RB", stats: "NFL rush king, 1993 MVP", rating: 98, offense: 99, defense: 35, star: 98, chemistry: 96 },
+  { id: "irvin", name: "Michael Irvin", team: "Dallas Cowboys", decade: "1990s", position: "WR", stats: "5x Pro Bowl, 3x champ", rating: 94, offense: 96, defense: 38, star: 95, chemistry: 94 },
+  { id: "deion-cowboys", name: "Deion Sanders", team: "Dallas Cowboys", decade: "1990s", position: "CB", stats: "Lockdown CB, return threat", rating: 99, offense: 62, defense: 99, star: 100, chemistry: 89 },
+  { id: "montana", name: "Joe Montana", team: "San Francisco 49ers", decade: "1980s", position: "QB", stats: "4x champ, 2x MVP", rating: 99, offense: 100, defense: 42, star: 100, chemistry: 99 },
+  { id: "rice", name: "Jerry Rice", team: "San Francisco 49ers", decade: "1980s", position: "WR", stats: "Record-setting WR", rating: 100, offense: 100, defense: 36, star: 100, chemistry: 98 },
+  { id: "craig", name: "Roger Craig", team: "San Francisco 49ers", decade: "1980s", position: "RB", stats: "1,000/1,000 season", rating: 91, offense: 94, defense: 35, star: 88, chemistry: 97 },
+  { id: "lott", name: "Ronnie Lott", team: "San Francisco 49ers", decade: "1980s", position: "S", stats: "10x Pro Bowl, tone setter", rating: 98, offense: 44, defense: 100, star: 97, chemistry: 96 },
+  { id: "brady", name: "Tom Brady", team: "New England Patriots", decade: "2000s", position: "QB", stats: "3x champ in decade", rating: 99, offense: 99, defense: 41, star: 100, chemistry: 99 },
+  { id: "moss-pats", name: "Randy Moss", team: "New England Patriots", decade: "2000s", position: "WR", stats: "23 TD season", rating: 98, offense: 100, defense: 32, star: 100, chemistry: 92 },
+  { id: "gronk-young", name: "Rob Gronkowski", team: "New England Patriots", decade: "2000s", position: "TE", stats: "Mismatch prototype", rating: 94, offense: 97, defense: 40, star: 96, chemistry: 95 },
+  { id: "seymour", name: "Richard Seymour", team: "New England Patriots", decade: "2000s", position: "DL", stats: "5x Pro Bowl, 3x champ", rating: 94, offense: 38, defense: 97, star: 91, chemistry: 96 },
+  { id: "bradshaw", name: "Terry Bradshaw", team: "Pittsburgh Steelers", decade: "1970s", position: "QB", stats: "4x champ, 1978 MVP", rating: 94, offense: 93, defense: 42, star: 94, chemistry: 97 },
+  { id: "franco", name: "Franco Harris", team: "Pittsburgh Steelers", decade: "1970s", position: "RB", stats: "8x 1,000-yard rusher", rating: 94, offense: 95, defense: 38, star: 92, chemistry: 96 },
+  { id: "meanjoe", name: "Mean Joe Greene", team: "Pittsburgh Steelers", decade: "1970s", position: "DL", stats: "2x DPOY, Steel Curtain", rating: 99, offense: 35, defense: 100, star: 98, chemistry: 99 },
+  { id: "lambert", name: "Jack Lambert", team: "Pittsburgh Steelers", decade: "1970s", position: "LB", stats: "1976 DPOY", rating: 97, offense: 32, defense: 99, star: 96, chemistry: 98 },
+  { id: "starr", name: "Bart Starr", team: "Green Bay Packers", decade: "1960s", position: "QB", stats: "5 titles, 2 SB MVPs", rating: 95, offense: 94, defense: 39, star: 93, chemistry: 99 },
+  { id: "hornung", name: "Paul Hornung", team: "Green Bay Packers", decade: "1960s", position: "FLEX", stats: "1961 MVP, do-it-all back", rating: 91, offense: 93, defense: 46, star: 92, chemistry: 96 },
+  { id: "nitschke", name: "Ray Nitschke", team: "Green Bay Packers", decade: "1960s", position: "LB", stats: "Iconic middle linebacker", rating: 95, offense: 30, defense: 98, star: 93, chemistry: 97 },
+  { id: "davis", name: "Willie Davis", team: "Green Bay Packers", decade: "1960s", position: "DL", stats: "5x champ edge force", rating: 94, offense: 33, defense: 97, star: 91, chemistry: 96 },
+  { id: "payton", name: "Walter Payton", team: "Chicago Bears", decade: "1980s", position: "RB", stats: "1985 champion, all-time great", rating: 99, offense: 99, defense: 44, star: 100, chemistry: 95 },
+  { id: "ditka", name: "Mike Ditka", team: "Chicago Bears", decade: "1980s", position: "TE", stats: "Legendary Bears figure", rating: 89, offense: 90, defense: 44, star: 90, chemistry: 92 },
+  { id: "singletary", name: "Mike Singletary", team: "Chicago Bears", decade: "1980s", position: "LB", stats: "2x DPOY, 10 Pro Bowls", rating: 98, offense: 31, defense: 100, star: 97, chemistry: 98 },
+  { id: "dent", name: "Richard Dent", team: "Chicago Bears", decade: "1980s", position: "DL", stats: "SB XX MVP edge rusher", rating: 96, offense: 32, defense: 98, star: 95, chemistry: 96 },
+  { id: "raylewis", name: "Ray Lewis", team: "Baltimore Ravens", decade: "2000s", position: "LB", stats: "2x DPOY, SB MVP", rating: 99, offense: 34, defense: 100, star: 100, chemistry: 97 },
+  { id: "reed", name: "Ed Reed", team: "Baltimore Ravens", decade: "2000s", position: "S", stats: "2004 DPOY, ball hawk", rating: 99, offense: 45, defense: 100, star: 99, chemistry: 97 },
+  { id: "suggs", name: "Terrell Suggs", team: "Baltimore Ravens", decade: "2000s", position: "DL", stats: "Edge power, 2011 DPOY", rating: 94, offense: 32, defense: 97, star: 92, chemistry: 95 },
+  { id: "jamal", name: "Jamal Lewis", team: "Baltimore Ravens", decade: "2000s", position: "RB", stats: "2,066 rush yards in 2003", rating: 92, offense: 94, defense: 36, star: 91, chemistry: 91 },
+  { id: "peyton", name: "Peyton Manning", team: "Indianapolis Colts", decade: "2000s", position: "QB", stats: "4 MVPs in decade", rating: 99, offense: 100, defense: 38, star: 100, chemistry: 98 },
+  { id: "marvin", name: "Marvin Harrison", team: "Indianapolis Colts", decade: "2000s", position: "WR", stats: "143 catches in 2002", rating: 97, offense: 99, defense: 34, star: 96, chemistry: 98 },
+  { id: "reggie", name: "Reggie Wayne", team: "Indianapolis Colts", decade: "2000s", position: "WR", stats: "6x Pro Bowl route ace", rating: 93, offense: 95, defense: 34, star: 91, chemistry: 97 },
+  { id: "freeney", name: "Dwight Freeney", team: "Indianapolis Colts", decade: "2000s", position: "DL", stats: "Spin move pass rusher", rating: 95, offense: 31, defense: 98, star: 94, chemistry: 93 },
+  { id: "griese", name: "Bob Griese", team: "Miami Dolphins", decade: "1970s", position: "QB", stats: "Perfect-season QB", rating: 92, offense: 91, defense: 40, star: 88, chemistry: 99 },
+  { id: "csonka", name: "Larry Csonka", team: "Miami Dolphins", decade: "1970s", position: "RB", stats: "Power back, 2x champ", rating: 93, offense: 94, defense: 42, star: 90, chemistry: 98 },
+  { id: "warfield", name: "Paul Warfield", team: "Miami Dolphins", decade: "1970s", position: "WR", stats: "Deep threat precision", rating: 94, offense: 96, defense: 35, star: 92, chemistry: 97 },
+  { id: "buoniconti", name: "Nick Buoniconti", team: "Miami Dolphins", decade: "1970s", position: "LB", stats: "No-Name Defense captain", rating: 93, offense: 30, defense: 96, star: 89, chemistry: 99 },
+  { id: "cunningham", name: "Randall Cunningham", team: "Minnesota Vikings", decade: "1990s", position: "QB", stats: "1998 scoring machine", rating: 92, offense: 96, defense: 36, star: 93, chemistry: 90 },
+  { id: "cris", name: "Cris Carter", team: "Minnesota Vikings", decade: "1990s", position: "WR", stats: "Hands, routes, red zone", rating: 96, offense: 98, defense: 34, star: 95, chemistry: 94 },
+  { id: "randle", name: "John Randle", team: "Minnesota Vikings", decade: "1990s", position: "DL", stats: "137.5 career sacks", rating: 96, offense: 32, defense: 98, star: 95, chemistry: 91 },
+  { id: "moss-vikes", name: "Randy Moss", team: "Minnesota Vikings", decade: "1990s", position: "WR", stats: "1998 rookie eruption", rating: 99, offense: 100, defense: 34, star: 100, chemistry: 91 },
+  { id: "donald", name: "Aaron Donald", team: "Los Angeles Rams", decade: "2010s", position: "DL", stats: "3x DPOY force", rating: 100, offense: 32, defense: 100, star: 100, chemistry: 95 },
+  { id: "gurley", name: "Todd Gurley", team: "Los Angeles Rams", decade: "2010s", position: "RB", stats: "2017 OPOY", rating: 93, offense: 96, defense: 35, star: 92, chemistry: 90 },
+  { id: "kupp", name: "Cooper Kupp", team: "Los Angeles Rams", decade: "2010s", position: "WR", stats: "Route volume specialist", rating: 91, offense: 94, defense: 36, star: 89, chemistry: 91 },
+  { id: "ramsey", name: "Jalen Ramsey", team: "Los Angeles Rams", decade: "2010s", position: "CB", stats: "All-Pro press corner", rating: 96, offense: 42, defense: 98, star: 96, chemistry: 91 },
+  { id: "mahomes", name: "Patrick Mahomes", team: "Kansas City Chiefs", decade: "2020s", position: "QB", stats: "2x MVP, multiple rings", rating: 99, offense: 100, defense: 39, star: 100, chemistry: 97 },
+  { id: "kelce", name: "Travis Kelce", team: "Kansas City Chiefs", decade: "2020s", position: "TE", stats: "Playoff record breaker", rating: 98, offense: 100, defense: 38, star: 98, chemistry: 98 },
+  { id: "chrisjones", name: "Chris Jones", team: "Kansas City Chiefs", decade: "2020s", position: "DL", stats: "Interior pressure star", rating: 97, offense: 34, defense: 99, star: 96, chemistry: 95 },
+  { id: "mcduffie", name: "Trent McDuffie", team: "Kansas City Chiefs", decade: "2020s", position: "CB", stats: "Modern nickel eraser", rating: 90, offense: 39, defense: 94, star: 86, chemistry: 93 },
+  { id: "barry", name: "Barry Sanders", team: "Detroit Lions", decade: "1990s", position: "RB", stats: "1997 MVP, 2,053 yards", rating: 100, offense: 100, defense: 35, star: 100, chemistry: 90 },
+  { id: "herman", name: "Herman Moore", team: "Detroit Lions", decade: "1990s", position: "WR", stats: "123 catches in 1995", rating: 91, offense: 94, defense: 34, star: 88, chemistry: 89 },
+  { id: "spielman", name: "Chris Spielman", team: "Detroit Lions", decade: "1990s", position: "LB", stats: "Tackle machine", rating: 90, offense: 31, defense: 94, star: 87, chemistry: 91 },
+  { id: "porcher", name: "Robert Porcher", team: "Detroit Lions", decade: "1990s", position: "DL", stats: "3x Pro Bowl edge", rating: 88, offense: 30, defense: 91, star: 84, chemistry: 88 },
+  { id: "stabler", name: "Ken Stabler", team: "Las Vegas Raiders", decade: "1970s", position: "QB", stats: "1974 MVP, ring leader", rating: 94, offense: 94, defense: 39, star: 93, chemistry: 95 },
+  { id: "biletnikoff", name: "Fred Biletnikoff", team: "Las Vegas Raiders", decade: "1970s", position: "WR", stats: "SB XI MVP", rating: 93, offense: 95, defense: 35, star: 91, chemistry: 95 },
+  { id: "art-shell", name: "Art Shell", team: "Las Vegas Raiders", decade: "1970s", position: "OL", stats: "8x Pro Bowl tackle", rating: 96, offense: 98, defense: 40, star: 93, chemistry: 96 },
+  { id: "willie-brown", name: "Willie Brown", team: "Las Vegas Raiders", decade: "1970s", position: "CB", stats: "Hall of Fame corner", rating: 96, offense: 42, defense: 98, star: 94, chemistry: 95 }
+];
+
+const offenseRosterAddons: Player[] = [
+  { id: "novacek", name: "Jay Novacek", team: "Dallas Cowboys", decade: "1990s", position: "TE", stats: "5x Pro Bowl safety valve", rating: 89, offense: 91, defense: 30, star: 86, chemistry: 95 },
+  { id: "larry-allen", name: "Larry Allen", team: "Dallas Cowboys", decade: "1990s", position: "OL", stats: "11x Pro Bowl power guard", rating: 99, offense: 100, defense: 34, star: 96, chemistry: 96 },
+  { id: "daryl-johnston", name: "Daryl Johnston", team: "Dallas Cowboys", decade: "1990s", position: "FLEX", stats: "All-Pro lead blocker", rating: 86, offense: 88, defense: 40, star: 82, chemistry: 97 },
+  { id: "harper", name: "Alvin Harper", team: "Dallas Cowboys", decade: "1990s", position: "WR", stats: "Vertical playoff threat", rating: 84, offense: 87, defense: 28, star: 80, chemistry: 90 },
+  { id: "rathman", name: "Tom Rathman", team: "San Francisco 49ers", decade: "1980s", position: "FLEX", stats: "West Coast fullback", rating: 87, offense: 89, defense: 38, star: 82, chemistry: 98 },
+  { id: "clark", name: "Dwight Clark", team: "San Francisco 49ers", decade: "1980s", position: "WR", stats: "The Catch, 2x Pro Bowl", rating: 91, offense: 93, defense: 30, star: 91, chemistry: 97 },
+  { id: "cross", name: "Randy Cross", team: "San Francisco 49ers", decade: "1980s", position: "OL", stats: "3x Pro Bowl interior anchor", rating: 90, offense: 92, defense: 32, star: 86, chemistry: 96 },
+  { id: "francis", name: "Russ Francis", team: "San Francisco 49ers", decade: "1980s", position: "TE", stats: "Championship-era tight end", rating: 84, offense: 86, defense: 31, star: 79, chemistry: 90 },
+  { id: "welker", name: "Wes Welker", team: "New England Patriots", decade: "2000s", position: "WR", stats: "Slot volume machine", rating: 94, offense: 97, defense: 29, star: 91, chemistry: 97 },
+  { id: "faulk-pats", name: "Kevin Faulk", team: "New England Patriots", decade: "2000s", position: "RB", stats: "Third-down weapon", rating: 86, offense: 89, defense: 35, star: 82, chemistry: 97 },
+  { id: "light", name: "Matt Light", team: "New England Patriots", decade: "2000s", position: "OL", stats: "3x champion left tackle", rating: 90, offense: 92, defense: 31, star: 86, chemistry: 96 },
+  { id: "brown-pats", name: "Troy Brown", team: "New England Patriots", decade: "2000s", position: "FLEX", stats: "Do-everything Patriot", rating: 87, offense: 89, defense: 50, star: 85, chemistry: 99 },
+  { id: "swann", name: "Lynn Swann", team: "Pittsburgh Steelers", decade: "1970s", position: "WR", stats: "SB X MVP, 3x Pro Bowl", rating: 92, offense: 94, defense: 28, star: 94, chemistry: 96 },
+  { id: "stallworth", name: "John Stallworth", team: "Pittsburgh Steelers", decade: "1970s", position: "WR", stats: "Big-play Hall of Famer", rating: 93, offense: 95, defense: 29, star: 92, chemistry: 96 },
+  { id: "webster", name: "Mike Webster", team: "Pittsburgh Steelers", decade: "1970s", position: "OL", stats: "9x Pro Bowl center", rating: 98, offense: 99, defense: 32, star: 95, chemistry: 98 },
+  { id: "grossman", name: "Randy Grossman", team: "Pittsburgh Steelers", decade: "1970s", position: "TE", stats: "Reliable title-era TE", rating: 82, offense: 84, defense: 32, star: 76, chemistry: 92 },
+  { id: "jim-taylor", name: "Jim Taylor", team: "Green Bay Packers", decade: "1960s", position: "RB", stats: "1962 MVP power back", rating: 96, offense: 97, defense: 34, star: 94, chemistry: 98 },
+  { id: "boyd-dowler", name: "Boyd Dowler", team: "Green Bay Packers", decade: "1960s", position: "WR", stats: "2x Pro Bowl receiver", rating: 87, offense: 89, defense: 28, star: 82, chemistry: 95 },
+  { id: "forrest-gregg", name: "Forrest Gregg", team: "Green Bay Packers", decade: "1960s", position: "OL", stats: "9x Pro Bowl tackle", rating: 98, offense: 99, defense: 34, star: 95, chemistry: 99 },
+  { id: "max-mcgee", name: "Max McGee", team: "Green Bay Packers", decade: "1960s", position: "WR", stats: "Super Bowl I hero", rating: 85, offense: 87, defense: 28, star: 84, chemistry: 94 },
+  { id: "mcmahon", name: "Jim McMahon", team: "Chicago Bears", decade: "1980s", position: "QB", stats: "1985 title starter", rating: 86, offense: 88, defense: 35, star: 86, chemistry: 94 },
+  { id: "gault", name: "Willie Gault", team: "Chicago Bears", decade: "1980s", position: "WR", stats: "World-class speed", rating: 86, offense: 89, defense: 30, star: 84, chemistry: 89 },
+  { id: "hilgenberg", name: "Jay Hilgenberg", team: "Chicago Bears", decade: "1980s", position: "OL", stats: "7x Pro Bowl center", rating: 92, offense: 94, defense: 31, star: 88, chemistry: 94 },
+  { id: "suhey", name: "Matt Suhey", team: "Chicago Bears", decade: "1980s", position: "FLEX", stats: "Payton-era fullback", rating: 82, offense: 84, defense: 38, star: 77, chemistry: 93 },
+  { id: "heap", name: "Todd Heap", team: "Baltimore Ravens", decade: "2000s", position: "TE", stats: "2x Pro Bowl target", rating: 88, offense: 91, defense: 31, star: 85, chemistry: 91 },
+  { id: "mason", name: "Derrick Mason", team: "Baltimore Ravens", decade: "2000s", position: "WR", stats: "Chain-moving WR", rating: 88, offense: 91, defense: 29, star: 84, chemistry: 91 },
+  { id: "ogden", name: "Jonathan Ogden", team: "Baltimore Ravens", decade: "2000s", position: "OL", stats: "11x Pro Bowl left tackle", rating: 99, offense: 100, defense: 34, star: 96, chemistry: 96 },
+  { id: "flacco", name: "Joe Flacco", team: "Baltimore Ravens", decade: "2000s", position: "QB", stats: "Big-arm playoff passer", rating: 84, offense: 86, defense: 30, star: 82, chemistry: 86 },
+  { id: "edgerrin", name: "Edgerrin James", team: "Indianapolis Colts", decade: "2000s", position: "RB", stats: "2x rushing champ", rating: 95, offense: 97, defense: 32, star: 93, chemistry: 97 },
+  { id: "dallas-clark", name: "Dallas Clark", team: "Indianapolis Colts", decade: "2000s", position: "TE", stats: "1,100-yard TE season", rating: 90, offense: 93, defense: 29, star: 88, chemistry: 96 },
+  { id: "tarik-glenn", name: "Tarik Glenn", team: "Indianapolis Colts", decade: "2000s", position: "OL", stats: "3x Pro Bowl blindside", rating: 91, offense: 93, defense: 31, star: 87, chemistry: 96 },
+  { id: "stokley", name: "Brandon Stokley", team: "Indianapolis Colts", decade: "2000s", position: "FLEX", stats: "Slot TD specialist", rating: 84, offense: 87, defense: 28, star: 80, chemistry: 92 },
+  { id: "mercury", name: "Mercury Morris", team: "Miami Dolphins", decade: "1970s", position: "RB", stats: "Perfect-season speed back", rating: 90, offense: 92, defense: 32, star: 88, chemistry: 98 },
+  { id: "kuechenberg", name: "Bob Kuechenberg", team: "Miami Dolphins", decade: "1970s", position: "OL", stats: "6x Pro Bowl guard", rating: 93, offense: 95, defense: 32, star: 89, chemistry: 97 },
+  { id: "mandich", name: "Jim Mandich", team: "Miami Dolphins", decade: "1970s", position: "TE", stats: "Perfect-season TE", rating: 82, offense: 84, defense: 32, star: 76, chemistry: 94 },
+  { id: "kiick", name: "Jim Kiick", team: "Miami Dolphins", decade: "1970s", position: "FLEX", stats: "Versatile backfield piece", rating: 84, offense: 87, defense: 36, star: 80, chemistry: 95 },
+  { id: "robert-smith", name: "Robert Smith", team: "Minnesota Vikings", decade: "1990s", position: "RB", stats: "Explosive 1,000-yard back", rating: 88, offense: 91, defense: 31, star: 85, chemistry: 90 },
+  { id: "steve-jordan", name: "Steve Jordan", team: "Minnesota Vikings", decade: "1990s", position: "TE", stats: "6x Pro Bowl tight end", rating: 90, offense: 92, defense: 31, star: 87, chemistry: 91 },
+  { id: "randall-mcdaniel", name: "Randall McDaniel", team: "Minnesota Vikings", decade: "1990s", position: "OL", stats: "12x Pro Bowl guard", rating: 99, offense: 100, defense: 34, star: 96, chemistry: 95 },
+  { id: "jake-reed", name: "Jake Reed", team: "Minnesota Vikings", decade: "1990s", position: "WR", stats: "Four straight 1,000-yard years", rating: 87, offense: 90, defense: 29, star: 83, chemistry: 91 },
+  { id: "goff", name: "Jared Goff", team: "Los Angeles Rams", decade: "2010s", position: "QB", stats: "Super Bowl run passer", rating: 87, offense: 90, defense: 29, star: 84, chemistry: 88 },
+  { id: "whitworth", name: "Andrew Whitworth", team: "Los Angeles Rams", decade: "2010s", position: "OL", stats: "All-Pro left tackle", rating: 95, offense: 97, defense: 31, star: 92, chemistry: 93 },
+  { id: "robert-woods", name: "Robert Woods", team: "Los Angeles Rams", decade: "2010s", position: "WR", stats: "Blocking plus routes", rating: 88, offense: 91, defense: 32, star: 84, chemistry: 94 },
+  { id: "higbee", name: "Tyler Higbee", team: "Los Angeles Rams", decade: "2010s", position: "TE", stats: "Play-action target", rating: 84, offense: 87, defense: 30, star: 79, chemistry: 89 },
+  { id: "pacheco", name: "Isiah Pacheco", team: "Kansas City Chiefs", decade: "2020s", position: "RB", stats: "Contact-balance runner", rating: 86, offense: 89, defense: 32, star: 84, chemistry: 93 },
+  { id: "tyreek-2020s", name: "Tyreek Hill", team: "Kansas City Chiefs", decade: "2020s", position: "WR", stats: "Game-breaking speed", rating: 97, offense: 99, defense: 28, star: 98, chemistry: 95 },
+  { id: "thuney", name: "Joe Thuney", team: "Kansas City Chiefs", decade: "2020s", position: "OL", stats: "All-Pro pass protector", rating: 94, offense: 96, defense: 31, star: 90, chemistry: 95 },
+  { id: "rashee", name: "Rashee Rice", team: "Kansas City Chiefs", decade: "2020s", position: "FLEX", stats: "YAC slot weapon", rating: 84, offense: 87, defense: 28, star: 82, chemistry: 88 },
+  { id: "scott-mitchell", name: "Scott Mitchell", team: "Detroit Lions", decade: "1990s", position: "QB", stats: "1995 passing surge", rating: 82, offense: 85, defense: 28, star: 78, chemistry: 84 },
+  { id: "brett-perriman", name: "Brett Perriman", team: "Detroit Lions", decade: "1990s", position: "WR", stats: "108 catches in 1995", rating: 86, offense: 89, defense: 28, star: 82, chemistry: 88 },
+  { id: "lomas-brown", name: "Lomas Brown", team: "Detroit Lions", decade: "1990s", position: "OL", stats: "7x Pro Bowl tackle", rating: 93, offense: 95, defense: 31, star: 89, chemistry: 90 },
+  { id: "johnnie-morton", name: "Johnnie Morton", team: "Detroit Lions", decade: "1990s", position: "FLEX", stats: "Reliable WR2", rating: 84, offense: 87, defense: 28, star: 79, chemistry: 87 },
+  { id: "cliff-branch", name: "Cliff Branch", team: "Las Vegas Raiders", decade: "1970s", position: "WR", stats: "Deep-speed champion", rating: 94, offense: 96, defense: 28, star: 93, chemistry: 95 },
+  { id: "mark-van-eeghen", name: "Mark van Eeghen", team: "Las Vegas Raiders", decade: "1970s", position: "RB", stats: "Power runner, 2x champ", rating: 88, offense: 90, defense: 34, star: 84, chemistry: 94 },
+  { id: "dave-casper", name: "Dave Casper", team: "Las Vegas Raiders", decade: "1970s", position: "TE", stats: "Hall of Fame tight end", rating: 95, offense: 97, defense: 31, star: 94, chemistry: 96 },
+  { id: "gene-upshaw", name: "Gene Upshaw", team: "Las Vegas Raiders", decade: "1970s", position: "OL", stats: "7x Pro Bowl guard", rating: 97, offense: 99, defense: 32, star: 94, chemistry: 96 }
+];
+
+type OffenseSeed = {
+  team: string;
+  decade: string;
+  cards: [string, Position, string, number, number, number, number][];
+};
+
+const expandedRosterSeeds: OffenseSeed[] = [
+  {
+    team: "Buffalo Bills",
+    decade: "1990s",
+    cards: [
+      ["Jim Kelly", "QB", "K-Gun field general", 94, 95, 94, 96],
+      ["Thurman Thomas", "RB", "MVP dual-threat back", 97, 98, 97, 96],
+      ["Andre Reed", "WR", "Middle-field chain mover", 94, 96, 93, 95],
+      ["James Lofton", "WR", "Deep Hall of Fame target", 91, 93, 91, 91],
+      ["Kent Hull", "OL", "No-huddle anchor", 92, 94, 88, 95],
+      ["Kenneth Davis", "FLEX", "Reliable playoff back", 84, 86, 80, 90]
+    ]
+  },
+  {
+    team: "Buffalo Bills",
+    decade: "2020s",
+    cards: [
+      ["Josh Allen", "QB", "MVP-level power passer", 98, 100, 99, 94],
+      ["James Cook", "RB", "Explosive modern runner", 87, 90, 84, 90],
+      ["Stefon Diggs", "WR", "All-Pro route winner", 95, 97, 95, 91],
+      ["Gabriel Davis", "WR", "Playoff vertical threat", 84, 87, 82, 86],
+      ["Dion Dawkins", "OL", "Pro Bowl left tackle", 90, 92, 87, 92],
+      ["Dalton Kincaid", "TE", "Space tight end", 84, 87, 82, 87]
+    ]
+  },
+  {
+    team: "Denver Broncos",
+    decade: "1990s",
+    cards: [
+      ["John Elway", "QB", "Late-prime title passer", 97, 98, 98, 96],
+      ["Terrell Davis", "RB", "2,000-yard MVP back", 98, 99, 98, 97],
+      ["Rod Smith", "WR", "Undrafted star receiver", 91, 93, 89, 94],
+      ["Shannon Sharpe", "TE", "Prototype receiving TE", 96, 98, 95, 95],
+      ["Gary Zimmerman", "OL", "Hall of Fame tackle", 96, 98, 94, 95],
+      ["Ed McCaffrey", "FLEX", "Tough playoff target", 88, 90, 86, 93]
+    ]
+  },
+  {
+    team: "New York Giants",
+    decade: "1980s",
+    cards: [
+      ["Phil Simms", "QB", "Super Bowl MVP passer", 90, 91, 89, 93],
+      ["Joe Morris", "RB", "Compact scoring runner", 89, 91, 86, 91],
+      ["Mark Bavaro", "TE", "Power tight end", 93, 95, 91, 94],
+      ["Lionel Manuel", "WR", "Reliable title target", 83, 85, 80, 88],
+      ["Brad Benson", "OL", "Pro Bowl tackle", 89, 91, 86, 91],
+      ["Maurice Carthon", "FLEX", "Physical fullback", 82, 84, 78, 90]
+    ]
+  },
+  {
+    team: "Philadelphia Eagles",
+    decade: "2000s",
+    cards: [
+      ["Donovan McNabb", "QB", "Dual-threat franchise QB", 93, 95, 94, 91],
+      ["Brian Westbrook", "RB", "Elite receiving back", 94, 97, 93, 92],
+      ["Terrell Owens", "WR", "Super Bowl run force", 96, 98, 98, 88],
+      ["DeSean Jackson", "WR", "Home-run speed", 91, 94, 92, 86],
+      ["Tra Thomas", "OL", "Blindside Pro Bowler", 91, 93, 88, 92],
+      ["Brent Celek", "TE", "Complete tight end", 84, 86, 80, 90]
+    ]
+  },
+  {
+    team: "Washington Commanders",
+    decade: "1980s",
+    cards: [
+      ["Joe Theismann", "QB", "MVP title-era QB", 91, 92, 90, 94],
+      ["John Riggins", "RB", "Diesel playoff hammer", 95, 96, 94, 96],
+      ["Art Monk", "WR", "Hall of Fame volume target", 94, 96, 92, 96],
+      ["Gary Clark", "WR", "Explosive Fun Bunch WR", 90, 92, 88, 92],
+      ["Joe Jacoby", "OL", "Hogs left tackle", 96, 98, 93, 97],
+      ["Clint Didier", "TE", "Red-zone tight end", 82, 84, 78, 89]
+    ]
+  },
+  {
+    team: "Seattle Seahawks",
+    decade: "2010s",
+    cards: [
+      ["Russell Wilson", "QB", "Moon-ball creator", 95, 97, 96, 92],
+      ["Marshawn Lynch", "RB", "Beast Mode finisher", 96, 97, 97, 94],
+      ["Doug Baldwin", "WR", "Precision slot winner", 90, 93, 88, 93],
+      ["Tyler Lockett", "WR", "Efficient deep separator", 89, 92, 87, 91],
+      ["Max Unger", "OL", "Super Bowl center", 90, 92, 86, 93],
+      ["Jimmy Graham", "TE", "Red-zone mismatch", 88, 91, 88, 86]
+    ]
+  },
+  {
+    team: "Arizona Cardinals",
+    decade: "2000s",
+    cards: [
+      ["Kurt Warner", "QB", "Playoff passing explosion", 94, 97, 94, 92],
+      ["Edgerrin James", "RB", "Veteran all-purpose back", 88, 90, 86, 89],
+      ["Larry Fitzgerald", "WR", "Postseason catch machine", 98, 99, 99, 95],
+      ["Anquan Boldin", "WR", "Physical possession star", 93, 95, 91, 94],
+      ["L.J. Shelton", "OL", "Long-time left tackle", 84, 86, 80, 87],
+      ["Steve Breaston", "FLEX", "Slot and return spark", 83, 86, 80, 86]
+    ]
+  },
+  {
+    team: "Tampa Bay Buccaneers",
+    decade: "2020s",
+    cards: [
+      ["Tom Brady", "QB", "Late-career title commander", 98, 99, 100, 96],
+      ["Leonard Fournette", "RB", "Playoff power back", 87, 90, 86, 90],
+      ["Mike Evans", "WR", "Touchdown boundary star", 95, 97, 94, 92],
+      ["Chris Godwin", "WR", "Slot-force receiver", 91, 94, 89, 91],
+      ["Tristan Wirfs", "OL", "Elite modern tackle", 97, 99, 94, 94],
+      ["Rob Gronkowski", "TE", "Playoff mismatch TE", 94, 96, 96, 94]
+    ]
+  },
+  {
+    team: "New Orleans Saints",
+    decade: "2000s",
+    cards: [
+      ["Drew Brees", "QB", "Record-volume passer", 98, 100, 98, 97],
+      ["Deuce McAllister", "RB", "Powerful franchise back", 90, 92, 88, 91],
+      ["Marques Colston", "WR", "Big slot target", 90, 93, 88, 95],
+      ["Reggie Bush", "FLEX", "Space-play weapon", 88, 91, 89, 88],
+      ["Jahri Evans", "OL", "All-Pro guard", 97, 99, 94, 96],
+      ["Jeremy Shockey", "TE", "Title-run tight end", 86, 88, 84, 88]
+    ]
+  },
+  {
+    team: "Atlanta Falcons",
+    decade: "2010s",
+    cards: [
+      ["Matt Ryan", "QB", "2016 MVP passer", 95, 97, 94, 94],
+      ["Devonta Freeman", "RB", "Super Bowl run back", 88, 91, 85, 90],
+      ["Julio Jones", "WR", "Prime size-speed monster", 99, 100, 99, 92],
+      ["Roddy White", "WR", "Veteran WR1", 91, 93, 89, 92],
+      ["Alex Mack", "OL", "All-Pro center", 94, 96, 91, 94],
+      ["Tony Gonzalez", "TE", "Late-prime Hall TE", 94, 96, 95, 91]
+    ]
+  },
+  {
+    team: "Carolina Panthers",
+    decade: "2010s",
+    cards: [
+      ["Cam Newton", "QB", "MVP power creator", 97, 98, 99, 91],
+      ["Christian McCaffrey", "RB", "1,000/1,000 weapon", 98, 100, 98, 90],
+      ["D.J. Moore", "WR", "YAC receiver", 88, 91, 85, 88],
+      ["Greg Olsen", "TE", "Three-level tight end", 92, 94, 90, 93],
+      ["Ryan Kalil", "OL", "All-Pro center", 93, 95, 90, 94],
+      ["Jonathan Stewart", "FLEX", "Power backfield piece", 86, 88, 83, 90]
+    ]
+  },
+  {
+    team: "Cincinnati Bengals",
+    decade: "2020s",
+    cards: [
+      ["Joe Burrow", "QB", "Playoff rhythm passer", 96, 98, 96, 93],
+      ["Joe Mixon", "RB", "Workhorse back", 88, 91, 86, 89],
+      ["Ja'Marr Chase", "WR", "Explosive alpha receiver", 97, 99, 98, 93],
+      ["Tee Higgins", "WR", "Contested-catch WR2", 90, 93, 88, 91],
+      ["Orlando Brown Jr.", "OL", "Massive edge protector", 89, 91, 86, 90],
+      ["Tyler Boyd", "FLEX", "Slot chain mover", 86, 88, 82, 91]
+    ]
+  },
+  {
+    team: "Cleveland Browns",
+    decade: "1950s",
+    cards: [
+      ["Otto Graham", "QB", "Dynasty-era winner", 98, 98, 99, 99],
+      ["Jim Brown", "RB", "All-time power back", 100, 100, 100, 96],
+      ["Dante Lavelli", "WR", "Hall of Fame end", 93, 95, 92, 96],
+      ["Mac Speedie", "WR", "Route technician", 91, 93, 90, 95],
+      ["Lou Groza", "OL", "Two-way tackle legend", 94, 96, 92, 98],
+      ["Dub Jones", "FLEX", "Multi-role scoring back", 88, 90, 86, 94]
+    ]
+  },
+  {
+    team: "New York Jets",
+    decade: "1960s",
+    cards: [
+      ["Joe Namath", "QB", "Guarantee-era passer", 94, 95, 96, 92],
+      ["Matt Snell", "RB", "Super Bowl power back", 88, 90, 85, 93],
+      ["Don Maynard", "WR", "Hall of Fame deep threat", 94, 96, 93, 93],
+      ["George Sauer", "WR", "Smooth AFL target", 88, 90, 85, 91],
+      ["Winston Hill", "OL", "Hall of Fame tackle", 94, 96, 91, 94],
+      ["Emerson Boozer", "FLEX", "Scoring backfield weapon", 86, 88, 84, 91]
+    ]
+  },
+  {
+    team: "Los Angeles Chargers",
+    decade: "2000s",
+    cards: [
+      ["Philip Rivers", "QB", "High-volume pocket passer", 93, 95, 91, 90],
+      ["LaDainian Tomlinson", "RB", "Record-setting MVP back", 100, 100, 100, 95],
+      ["Vincent Jackson", "WR", "Vertical size receiver", 90, 93, 88, 88],
+      ["Keenan McCardell", "WR", "Veteran route target", 86, 88, 83, 90],
+      ["Kris Dielman", "OL", "Mauling Pro Bowl guard", 92, 94, 88, 92],
+      ["Antonio Gates", "TE", "Basketball-body TE legend", 98, 99, 98, 93]
+    ]
+  },
+  {
+    team: "Tennessee Titans",
+    decade: "1990s",
+    cards: [
+      ["Steve McNair", "QB", "Tough dual-threat leader", 92, 94, 92, 94],
+      ["Eddie George", "RB", "Workhorse power back", 92, 94, 90, 94],
+      ["Derrick Mason", "WR", "Reliable separator", 87, 90, 84, 90],
+      ["Yancey Thigpen", "WR", "Big-play target", 86, 89, 84, 86],
+      ["Bruce Matthews", "OL", "All-time line great", 99, 100, 97, 98],
+      ["Frank Wycheck", "TE", "Music City tight end", 88, 90, 84, 92]
+    ]
+  },
+  {
+    team: "Houston Texans",
+    decade: "2010s",
+    cards: [
+      ["Deshaun Watson", "QB", "Escape-play creator", 90, 93, 90, 84],
+      ["Arian Foster", "RB", "Zone-run superstar", 94, 96, 92, 91],
+      ["Andre Johnson", "WR", "Physical WR1", 96, 98, 95, 91],
+      ["DeAndre Hopkins", "WR", "Catch-radius artist", 97, 99, 97, 90],
+      ["Duane Brown", "OL", "Pro Bowl blindside", 92, 94, 88, 91],
+      ["Owen Daniels", "TE", "Play-action tight end", 85, 87, 81, 90]
+    ]
+  },
+  {
+    team: "Jacksonville Jaguars",
+    decade: "1990s",
+    cards: [
+      ["Mark Brunell", "QB", "Lefty playoff passer", 90, 92, 88, 90],
+      ["Fred Taylor", "RB", "Explosive franchise back", 94, 96, 92, 89],
+      ["Jimmy Smith", "WR", "Pro Bowl route star", 94, 96, 92, 92],
+      ["Keenan McCardell", "WR", "Thunder-and-lightning WR", 90, 92, 87, 92],
+      ["Tony Boselli", "OL", "Elite left tackle", 98, 99, 96, 93],
+      ["Pete Mitchell", "TE", "Reliable receiving TE", 82, 84, 78, 87]
+    ]
+  },
+  {
+    team: "Dallas Cowboys",
+    decade: "1970s",
+    cards: [
+      ["Roger Staubach", "QB", "Captain Comeback", 97, 98, 98, 97],
+      ["Tony Dorsett", "RB", "Speed title back", 96, 98, 95, 94],
+      ["Drew Pearson", "WR", "Clutch original 88", 93, 95, 92, 95],
+      ["Billy Joe DuPree", "TE", "Complete title TE", 86, 88, 82, 92],
+      ["Rayfield Wright", "OL", "Hall of Fame tackle", 97, 99, 94, 96],
+      ["Preston Pearson", "FLEX", "Playoff receiving back", 84, 86, 81, 92]
+    ]
+  },
+  {
+    team: "Green Bay Packers",
+    decade: "2010s",
+    cards: [
+      ["Aaron Rodgers", "QB", "MVP efficiency machine", 100, 100, 100, 94],
+      ["Aaron Jones", "RB", "Explosive receiving back", 89, 92, 87, 91],
+      ["Davante Adams", "WR", "Release-game master", 98, 100, 98, 94],
+      ["Jordy Nelson", "WR", "Sideline timing target", 92, 95, 90, 94],
+      ["David Bakhtiari", "OL", "Elite pass protector", 97, 99, 94, 94],
+      ["Randall Cobb", "FLEX", "Slot and gadget spark", 88, 91, 86, 92]
+    ]
+  },
+  {
+    team: "Kansas City Chiefs",
+    decade: "2010s",
+    cards: [
+      ["Alex Smith", "QB", "Efficient playoff passer", 87, 89, 84, 92],
+      ["Jamaal Charles", "RB", "Yards-per-carry star", 97, 99, 96, 90],
+      ["Tyreek Hill", "WR", "Game-breaking speed", 96, 99, 97, 91],
+      ["Dwayne Bowe", "WR", "Physical WR1", 87, 89, 84, 88],
+      ["Eric Fisher", "OL", "Former top-pick tackle", 86, 88, 82, 88],
+      ["Travis Kelce", "TE", "Route-running tight end", 97, 99, 97, 95]
+    ]
+  },
+  {
+    team: "New England Patriots",
+    decade: "2010s",
+    cards: [
+      ["Tom Brady", "QB", "Second-dynasty commander", 100, 100, 100, 99],
+      ["James White", "RB", "Super Bowl receiving back", 87, 90, 86, 96],
+      ["Julian Edelman", "WR", "Playoff slot fighter", 91, 94, 90, 97],
+      ["Brandin Cooks", "WR", "Vertical separator", 89, 92, 88, 87],
+      ["Nate Solder", "OL", "Title-era left tackle", 89, 91, 86, 93],
+      ["Rob Gronkowski", "TE", "Peak matchup breaker", 100, 100, 100, 97]
+    ]
+  },
+  {
+    team: "Los Angeles Rams",
+    decade: "1990s",
+    cards: [
+      ["Kurt Warner", "QB", "Greatest Show passer", 97, 100, 97, 95],
+      ["Marshall Faulk", "RB", "MVP receiving back", 100, 100, 100, 96],
+      ["Isaac Bruce", "WR", "Smooth vertical WR", 95, 97, 93, 94],
+      ["Torry Holt", "WR", "Route-speed star", 94, 97, 92, 93],
+      ["Orlando Pace", "OL", "Hall of Fame tackle", 99, 100, 97, 95],
+      ["Az-Zahir Hakim", "FLEX", "Slot explosive piece", 86, 89, 84, 88]
+    ]
+  }
+];
+
+const expandedSpinDeck: Spin[] = expandedRosterSeeds.map(({ team, decade }) => ({ team, decade }));
+const spinDeck: Spin[] = [...baseSpinDeck, ...expandedSpinDeck];
+const expandedOffensePlayers: Player[] = expandedRosterSeeds.flatMap(({ team, decade, cards }) =>
+  cards.map(([name, position, stats, rating, offense, star, chemistry]) => ({
+    id: `${team}-${decade}-${name}`.toLowerCase().replaceAll(" ", "-").replaceAll(".", "").replaceAll("'", ""),
+    name,
+    team,
+    decade,
+    position,
+    stats,
+    rating,
+    offense,
+    defense: position === "OL" ? 34 : position === "TE" || position === "FLEX" ? 38 : 30,
+    star,
+    chemistry
+  }))
+);
+
+const defenseRatings: Record<string, Pick<Player, "rating" | "offense" | "defense" | "star" | "chemistry" | "stats">> = {
+  "Dallas Cowboys-1990s": { rating: 93, offense: 35, defense: 95, star: 92, chemistry: 95, stats: "Fast, physical championship defense" },
+  "San Francisco 49ers-1980s": { rating: 92, offense: 34, defense: 94, star: 91, chemistry: 96, stats: "Balanced title-era unit" },
+  "New England Patriots-2000s": { rating: 94, offense: 33, defense: 96, star: 92, chemistry: 99, stats: "Belichick-era matchup defense" },
+  "Pittsburgh Steelers-1970s": { rating: 100, offense: 30, defense: 100, star: 100, chemistry: 99, stats: "Steel Curtain, all-time force" },
+  "Green Bay Packers-1960s": { rating: 95, offense: 32, defense: 97, star: 93, chemistry: 99, stats: "Lombardi-era title defense" },
+  "Chicago Bears-1980s": { rating: 100, offense: 30, defense: 100, star: 100, chemistry: 98, stats: "46 Defense, chaos machine" },
+  "Baltimore Ravens-2000s": { rating: 100, offense: 30, defense: 100, star: 100, chemistry: 97, stats: "Historic physical defense" },
+  "Indianapolis Colts-2000s": { rating: 89, offense: 36, defense: 91, star: 87, chemistry: 92, stats: "Speed rush dome defense" },
+  "Miami Dolphins-1970s": { rating: 94, offense: 32, defense: 96, star: 91, chemistry: 99, stats: "No-Name Defense, perfect-season fit" },
+  "Minnesota Vikings-1990s": { rating: 90, offense: 34, defense: 92, star: 89, chemistry: 90, stats: "Explosive front with turnover punch" },
+  "Los Angeles Rams-2010s": { rating: 95, offense: 34, defense: 97, star: 96, chemistry: 92, stats: "Aaron Donald-led pressure unit" },
+  "Kansas City Chiefs-2020s": { rating: 94, offense: 35, defense: 96, star: 94, chemistry: 96, stats: "Modern pressure and coverage unit" },
+  "Detroit Lions-1990s": { rating: 84, offense: 34, defense: 86, star: 82, chemistry: 86, stats: "Scrappy NFC Central defense" },
+  "Las Vegas Raiders-1970s": { rating: 93, offense: 33, defense: 95, star: 92, chemistry: 95, stats: "Hard-hitting title-era defense" }
+};
+
+const offensePlayers = [...players, ...offenseRosterAddons, ...expandedOffensePlayers].filter((player) => offensePositions.includes(player.position));
+
+function slugify(value: string) {
+  return value.toLowerCase().replaceAll(" ", "-");
+}
+
+function randomFrom<T>(items: T[]) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function getDefenseProfile(team: string, decade: string) {
+  const exact = defenseRatings[`${team}-${decade}`];
+  if (exact) return exact;
+
+  const teamProfile = spinDeck
+    .filter((spin) => spin.team === team)
+    .map((spin) => defenseRatings[`${spin.team}-${spin.decade}`])
+    .find(Boolean);
+
+  const decadeProfile = spinDeck
+    .filter((spin) => spin.decade === decade)
+    .map((spin) => defenseRatings[`${spin.team}-${spin.decade}`])
+    .find(Boolean);
+
+  const base = teamProfile || decadeProfile || { rating: 88, offense: 34, defense: 90, star: 86, chemistry: 88, stats: "Fantasy-style team defense" };
+  const oldEraBonus = decade === "1960s" || decade === "1970s" ? 2 : 0;
+  const modernBonus = decade === "2000s" || decade === "2020s" ? 1 : 0;
+
+  return {
+    rating: Math.min(99, Math.max(80, base.rating - 3 + oldEraBonus + modernBonus)),
+    offense: base.offense,
+    defense: Math.min(99, Math.max(82, base.defense - 3 + oldEraBonus + modernBonus)),
+    star: Math.min(99, Math.max(80, base.star - 3 + oldEraBonus)),
+    chemistry: Math.min(99, Math.max(82, base.chemistry - 2 + oldEraBonus)),
+    stats: `${decade} fantasy team defense`
+  };
+}
+
+function getTeamDefense(spin: Spin): Player {
+  const rating = getDefenseProfile(spin.team, spin.decade);
+
+  return {
+    id: `${slugify(spin.team)}-${spin.decade}-def`,
+    name: `${spin.team} Defense`,
+    team: spin.team,
+    decade: spin.decade,
+    position: "DEF",
+    ...rating
+  };
+}
+
+const teamDefenses: Player[] = spinDeck.map(getTeamDefense);
+const draftPool = [...offensePlayers, ...teamDefenses];
+
+const exampleRoster: Player[] = ["montana", "barry", "rice", "moss-vikes", "kelce", "art-shell", "payton", "baltimore-ravens-2000s-def"]
+  .map((id) => [...players, ...teamDefenses].find((player) => player.id === id))
+  .filter(Boolean) as Player[];
+
+const positionCopy: Record<Position, string> = {
+  QB: "Field general",
+  RB: "Backfield engine",
+  WR: "Boundary weapon",
+  TE: "Mismatch maker",
+  OL: "Pocket security",
+  DL: "Trench disruptor",
+  LB: "Second-level captain",
+  CB: "Lockdown edge",
+  S: "Deep eraser",
+  FLEX: "Wildcard star",
+  DEF: "Fantasy defense"
+};
+
+function getScore(roster: (Player | null)[]) {
+  const filled = roster.filter(Boolean) as Player[];
+  if (!filled.length) {
+    return { overall: 0, offense: 0, defense: 0, star: 0, balance: 0, chemistry: 0, wins: 0, losses: 17 };
+  }
+
+  const avg = (key: keyof Pick<Player, "rating" | "offense" | "star" | "chemistry">) =>
+    filled.reduce((sum, player) => sum + player[key], 0) / filled.length;
+  const offensiveFilled = filled.filter((player) => player.position !== "DEF");
+  const defenseFilled = filled.filter((player) => player.position === "DEF");
+  const offense = offensiveFilled.length
+    ? offensiveFilled.reduce((sum, player) => sum + player.offense, 0) / offensiveFilled.length
+    : avg("offense");
+  const defense = defenseFilled.length
+    ? defenseFilled.reduce((sum, player) => sum + player.defense, 0) / defenseFilled.length
+    : 70;
+  const star = avg("star");
+  const chemistry = avg("chemistry");
+  const filledSlots = filled.length / rosterSlots.length;
+  const positionSpread = new Set(filled.map((player) => player.position)).size / 7;
+  const eraBonus = new Set(filled.map((player) => `${player.team}-${player.decade}`)).size >= 5 ? 6 : 2;
+  const balance = Math.min(100, Math.round(58 + positionSpread * 26 + filledSlots * 10 + eraBonus));
+  const averageRating = avg("rating");
+  const overall = averageRating * 0.3 + offense * 0.22 + defense * 0.14 + star * 0.14 + balance * 0.11 + chemistry * 0.09;
+  const completeBonus = filled.length === rosterSlots.length ? 3 : 0;
+  const rawWins = Math.round((overall + completeBonus - 70) / 2.25);
+  let wins = Math.max(0, Math.min(16, rawWins));
+
+  if (
+    filled.length === rosterSlots.length &&
+    overall >= 98 &&
+    averageRating >= 97 &&
+    offense >= 98 &&
+    defense >= 95 &&
+    star >= 97 &&
+    balance >= 96 &&
+    chemistry >= 95
+  ) {
+    wins = 17;
+  } else if (overall >= 95 && offense >= 96 && defense >= 90 && star >= 94 && balance >= 92 && chemistry >= 92) {
+    wins = Math.max(wins, 15);
+  }
+
+  return {
+    overall: Math.round(overall),
+    offense: Math.round(offense),
+    defense: Math.round(defense),
+    star: Math.round(star),
+    balance: Math.round(balance),
+    chemistry: Math.round(chemistry),
+    wins,
+    losses: 17 - wins
+  };
+}
+
+function canFill(slot: Position, player: Player) {
+  return (slot === "FLEX" && player.position !== "DEF") || slot === player.position;
+}
+
+function ratingTone(rating: number) {
+  if (rating >= 98) return "legendary";
+  if (rating >= 94) return "elite";
+  if (rating >= 90) return "prime";
+  return "solid";
+}
+
+export default function Home() {
+  const [screen, setScreen] = useState<Screen>("home");
+  const [currentSpin, setCurrentSpin] = useState<Spin | null>(null);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [drafted, setDrafted] = useState<Player[]>([]);
+  const [roster, setRoster] = useState<(Player | null)[]>(Array(rosterSlots.length).fill(null));
+  const [saved, setSaved] = useState(false);
+  const [showProjection, setShowProjection] = useState(false);
+  const [teamRefreshUsed, setTeamRefreshUsed] = useState(false);
+  const [decadeRefreshUsed, setDecadeRefreshUsed] = useState(false);
+
+  const round = Math.min(drafted.length + 1, rosterSlots.length);
+  const score = useMemo(() => getScore(roster), [roster]);
+  const offenseOptions = currentSpin
+    ? offensePlayers.filter((player) => player.team === currentSpin.team && player.decade === currentSpin.decade)
+    : [];
+  const availablePlayers = currentSpin
+    ? [...offenseOptions, getTeamDefense(currentSpin)].filter((player) => !drafted.some((draftedPlayer) => draftedPlayer.id === player.id))
+    : [];
+  const teamRefreshOptions = currentSpin
+    ? spinDeck.filter((spin) => spin.decade === currentSpin.decade && spin.team !== currentSpin.team)
+    : [];
+  const decadeRefreshOptions = currentSpin
+    ? spinDeck.filter((spin) => spin.team === currentSpin.team && spin.decade !== currentSpin.decade)
+    : [];
+  const isRosterComplete = roster.every(Boolean);
+  const hasOpenSlot = (player: Player) => roster.some((slotPlayer, index) => !slotPlayer && canFill(rosterSlots[index], player));
+
+  function resetGame(useExample = false) {
+    const nextRoster = Array(rosterSlots.length).fill(null) as (Player | null)[];
+    const nextDrafted = useExample ? [...exampleRoster] : [];
+
+    if (useExample) {
+      nextDrafted.forEach((player) => {
+        const index = nextRoster.findIndex((slotPlayer, slotIndex) => !slotPlayer && canFill(rosterSlots[slotIndex], player));
+        if (index >= 0) nextRoster[index] = player;
+      });
+    }
+
+    setCurrentSpin(null);
+    setIsSpinning(false);
+    setDrafted(nextDrafted);
+    setRoster(nextRoster);
+    setSaved(false);
+    setShowProjection(false);
+    setTeamRefreshUsed(false);
+    setDecadeRefreshUsed(false);
+    setScreen(useExample ? "rating" : "draft");
+  }
+
+  function spinTeam() {
+    setIsSpinning(true);
+    window.setTimeout(() => {
+      setCurrentSpin(randomFrom(spinDeck));
+      setIsSpinning(false);
+    }, 680);
+  }
+
+  function refreshTeam() {
+    if (!currentSpin || teamRefreshUsed || drafted.length >= rosterSlots.length) return;
+    if (!teamRefreshOptions.length) return;
+    setCurrentSpin(randomFrom(teamRefreshOptions));
+    setTeamRefreshUsed(true);
+  }
+
+  function refreshDecade() {
+    if (!currentSpin || decadeRefreshUsed || drafted.length >= rosterSlots.length) return;
+    if (!decadeRefreshOptions.length) return;
+    setCurrentSpin(randomFrom(decadeRefreshOptions));
+    setDecadeRefreshUsed(true);
+  }
+
+  function draftPlayer(player: Player) {
+    if (drafted.length >= rosterSlots.length || drafted.some((draftedPlayer) => draftedPlayer.id === player.id)) return;
+    const openIndex = roster.findIndex((slotPlayer, index) => !slotPlayer && canFill(rosterSlots[index], player));
+    if (openIndex < 0) return;
+    setDrafted((items) => [...items, player]);
+    if (openIndex >= 0) {
+      setRoster((items) => items.map((slotPlayer, index) => (index === openIndex ? player : slotPlayer)));
+    }
+    setCurrentSpin(null);
+    if (drafted.length + 1 >= rosterSlots.length) setScreen("rating");
+  }
+
+  function clearSlot(slotIndex: number) {
+    const removedPlayer = roster[slotIndex];
+    setRoster((items) => items.map((slotPlayer, index) => (index === slotIndex ? null : slotPlayer)));
+    if (removedPlayer) {
+      setDrafted((items) => items.filter((player) => player.id !== removedPlayer.id));
+    }
+  }
+
+  const navItems: { key: Screen; label: string }[] = [
+    { key: "draft", label: "Draft" },
+    { key: "rating", label: "Ratings" },
+    { key: "system", label: "Design System" }
+  ];
+
+  return (
+    <main className="app-shell">
+      <div className="stadium-glow" />
+      <header className="topbar">
+        <button className="brand-mark" onClick={() => setScreen("home")} aria-label="Go home">
+          <span>17</span><span>-0</span>
+        </button>
+        <nav className="step-nav" aria-label="Game sections">
+          {navItems.map((item) => (
+            <button key={item.key} className={screen === item.key ? "active" : ""} onClick={() => setScreen(item.key)}>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <button className="small-action" onClick={() => resetGame(false)}>New Draft</button>
+      </header>
+
+      {screen === "home" && (
+        <section className="hero screen-fade">
+          <div className="yard-lines" />
+          <div className="hero-content">
+            <p className="eyebrow">NFL all-time draft game</p>
+            <h1>17-0</h1>
+            <p className="hero-copy">Build the ultimate NFL all-time team and see if you can go undefeated.</p>
+            <div className="hero-actions">
+              <button className="primary-cta" onClick={() => resetGame(false)}>Start Draft</button>
+              <button className="secondary-cta" onClick={() => setScreen("how")}>How to Play</button>
+              <button className="secondary-cta" onClick={() => resetGame(true)}>View Example Team</button>
+            </div>
+          </div>
+          <div className="hero-scoreboard">
+            <span>Target Record</span>
+            <strong>17-0</strong>
+          </div>
+        </section>
+      )}
+
+      {screen === "how" && (
+        <section className="content-grid screen-fade">
+          <div className="section-heading">
+            <p className="eyebrow">How to play</p>
+            <h2>Spin, draft, assign, reveal.</h2>
+          </div>
+          <div className="instruction-list">
+            {[
+              "Spin to get a random NFL team and decade.",
+              "Choose one offensive player or that team's fantasy-style defense.",
+              "Watch the player drop into the live field lineup.",
+              "Fill every offensive spot plus one team defense.",
+              "Your team is rated on offense, defense, star power, chemistry, and balance.",
+              "Try to finish with a perfect 17-0 record."
+            ].map((item, index) => (
+              <article className="instruction-card" key={item}>
+                <span>{index + 1}</span>
+                <p>{item}</p>
+              </article>
+            ))}
+          </div>
+          <button className="primary-cta inline" onClick={() => resetGame(false)}>Start Draft</button>
+        </section>
+      )}
+
+      {screen === "draft" && (
+        <section className="draft-layout screen-fade">
+          <div className="draft-main">
+            <div className="section-heading compact">
+              <p className="eyebrow">Draft night</p>
+              <h2>Round {round} of {rosterSlots.length}</h2>
+              <p className="muted">Spin the deck, draft one player or team defense, and watch your lineup fill in live.</p>
+            </div>
+
+            <div className={`spin-card ${isSpinning ? "spinning" : ""}`}>
+              <div>
+                <span className="card-kicker">Team + decade</span>
+                <strong>{isSpinning ? "Finding a matchup..." : currentSpin ? `${currentSpin.team} - ${currentSpin.decade}` : "Ready to reveal"}</strong>
+              </div>
+              <div className="spin-actions">
+                <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || drafted.length >= rosterSlots.length}>
+                  Spin Team + Decade
+                </button>
+                <div className="reroll-actions">
+                  <button className="secondary-cta" onClick={refreshTeam} disabled={!currentSpin || teamRefreshUsed || !teamRefreshOptions.length || isSpinning || drafted.length >= rosterSlots.length}>
+                    {teamRefreshUsed ? "Team Refresh Used" : teamRefreshOptions.length ? "Refresh Team" : "No Team Refresh"}
+                  </button>
+                  <button className="secondary-cta" onClick={refreshDecade} disabled={!currentSpin || decadeRefreshUsed || !decadeRefreshOptions.length || isSpinning || drafted.length >= rosterSlots.length}>
+                    {decadeRefreshUsed ? "Decade Refresh Used" : decadeRefreshOptions.length ? "Refresh Decade" : "No Decade Refresh"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="list-heading">
+              <span>{currentSpin ? "Available roster options" : "Player board preview"}</span>
+              <strong>{currentSpin ? `${availablePlayers.length} players` : "Spin to unlock"}</strong>
+            </div>
+            <div className="player-grid">
+              {(availablePlayers.length ? availablePlayers : draftPool.slice(0, 8)).map((player) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  disabled={!currentSpin || drafted.some((draftedPlayer) => draftedPlayer.id === player.id) || drafted.length >= rosterSlots.length || !hasOpenSlot(player)}
+                  ghost={!currentSpin}
+                  unavailable={!!currentSpin && !hasOpenSlot(player)}
+                  onDraft={() => draftPlayer(player)}
+                />
+              ))}
+            </div>
+          </div>
+          <aside className="draft-sidebar">
+            <ProgressPanel
+              drafted={drafted.length}
+              score={score}
+              complete={isRosterComplete}
+              showProjection={showProjection}
+              onToggleProjection={() => setShowProjection((value) => !value)}
+              onReveal={() => setScreen("rating")}
+            />
+            <LiveLineup roster={roster} onClear={clearSlot} />
+          </aside>
+        </section>
+      )}
+
+      {screen === "rating" && (
+        <section className="rating-layout screen-fade">
+          <div className="record-reveal">
+            <p className="eyebrow">Predicted final record</p>
+            <strong>{score.wins}-{score.losses}</strong>
+            <span>{score.wins === 17 ? "Undefeated profile" : score.wins >= 14 ? "Championship contender" : "Playoff-caliber build"}</span>
+            <button className="primary-cta" onClick={() => setScreen("results")}>Final Reveal</button>
+          </div>
+          <div className="rating-board">
+            <RatingBar label="Overall Team Score" value={score.overall} />
+            <RatingBar label="Offensive Score" value={score.offense} />
+            <RatingBar label="Defensive Score" value={score.defense} />
+            <RatingBar label="Star Power Score" value={score.star} />
+            <RatingBar label="Lineup Balance Score" value={score.balance} />
+            <RatingBar label="Chemistry / Era Fit Score" value={score.chemistry} />
+          </div>
+        </section>
+      )}
+
+      {screen === "results" && (
+        <section className={`results-screen screen-fade ${score.wins === 17 ? "perfect" : ""}`}>
+          <div className="confetti" aria-hidden="true" />
+          <p className="eyebrow">Final results</p>
+          <h2>{score.wins === 17 ? "Perfect Season!" : "Great Team, But Not Perfect"}</h2>
+          <strong>{score.wins}-{score.losses}</strong>
+          <div className="trophy" aria-hidden="true" />
+          <div className="result-actions">
+            <button className="primary-cta" onClick={() => resetGame(false)}>Draft Again</button>
+            <button className="secondary-cta" onClick={() => navigator.clipboard?.writeText(`My 17-0 draft team went ${score.wins}-${score.losses}!`)}>Share</button>
+            <button className="secondary-cta" onClick={() => setSaved(true)}>{saved ? "Team Saved" : "Save Team"}</button>
+            <button className="secondary-cta" onClick={() => setScreen("draft")}>View Lineup</button>
+          </div>
+        </section>
+      )}
+
+      {screen === "system" && <DesignSystem onStart={() => resetGame(false)} />}
+    </main>
+  );
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function PlayerCard({ player, disabled, ghost, unavailable, onDraft }: { player: Player; disabled: boolean; ghost?: boolean; unavailable?: boolean; onDraft: () => void }) {
+  const tone = ghost ? "locked" : ratingTone(player.rating);
+
+  return (
+    <article className={`player-card tone-${tone} ${ghost ? "ghost-card" : ""}`}>
+      <div className="card-topline">
+        <span>{player.position}</span>
+        <span className={`rating-badge ${tone}`}>{ghost ? "LOCK" : player.decade}</span>
+      </div>
+      <h3>{ghost ? "Spin to unlock" : player.name}</h3>
+      <p>{ghost ? "A collectible player card will appear here after the reveal." : `${player.team} / ${player.decade}`}</p>
+      <div className="stat-strip">{ghost ? "Era / role / key stats" : player.stats}</div>
+      <button className="draft-button" disabled={disabled} onClick={onDraft}>{unavailable ? "Slot Filled" : "Draft Player"}</button>
+    </article>
+  );
+}
+
+function ProgressPanel({
+  drafted,
+  score,
+  complete,
+  showProjection,
+  onToggleProjection,
+  onReveal
+}: {
+  drafted: number;
+  score: ReturnType<typeof getScore>;
+  complete: boolean;
+  showProjection: boolean;
+  onToggleProjection: () => void;
+  onReveal: () => void;
+}) {
+  return (
+    <div className="progress-panel">
+      <div className="panel-title">
+        <span>War room</span>
+        <strong>{drafted}/{rosterSlots.length}</strong>
+      </div>
+      <div className={`mini-score ${showProjection ? "" : "hidden-score"}`}>
+        <span>Live projection</span>
+        <strong>{showProjection ? `${score.wins}-${score.losses}` : "--"}</strong>
+      </div>
+      <button className="secondary-cta full peek-button" onClick={onToggleProjection}>
+        {showProjection ? "Hide Projection" : "Peek at Projection"}
+      </button>
+      <RatingBar label="Roster filled" value={Math.round((drafted / rosterSlots.length) * 100)} />
+      <button className="secondary-cta full" disabled={!complete} onClick={onReveal}>{complete ? "Reveal Record" : "Keep Drafting"}</button>
+    </div>
+  );
+}
+
+function LiveLineup({ roster, onClear }: { roster: (Player | null)[]; onClear: (slotIndex: number) => void }) {
+  return (
+    <div className="live-lineup-card">
+      <div className="panel-title">
+        <span>Live lineup</span>
+        <strong>{roster.filter(Boolean).length}/{rosterSlots.length}</strong>
+      </div>
+      <div className="mini-field" aria-label="Fantasy lineup">
+        {rosterSlots.map((slot, index) => {
+          const player = roster[index];
+          return (
+            <button
+              className={`field-marker ${player ? "filled" : ""} slot-${index}`}
+              key={`${slot}-${index}`}
+              onClick={() => player && onClear(index)}
+              aria-label={player ? `${slot}: ${player.name}` : `${slot}: empty`}
+            >
+              <span>{slot}</span>
+              <strong>{player ? getInitials(player.name) : "+"}</strong>
+              <small>{player ? "Set" : "Open"}</small>
+            </button>
+          );
+        })}
+      </div>
+      <p className="hint">Tap a filled spot to clear it if you want to reopen that position.</p>
+    </div>
+  );
+}
+
+function RatingBar({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rating-row">
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+      <div className="bar-track">
+        <span style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function DesignSystem({ onStart }: { onStart: () => void }) {
+  return (
+    <section className="system-screen screen-fade">
+      <div className="section-heading compact">
+        <p className="eyebrow">Figma-ready design system</p>
+        <h2>17-0 interface kit</h2>
+        <p className="muted">Reusable tokens and components for mobile and desktop layouts.</p>
+      </div>
+      <div className="system-grid">
+        <article className="system-card">
+          <h3>Color palette</h3>
+          <div className="swatches">
+            {["#05070d", "#071523", "#f8fafc", "#b7c0cc", "#0f8f51", "#d5a11e"].map((color) => (
+              <span key={color} style={{ background: color }}>{color}</span>
+            ))}
+          </div>
+        </article>
+        <article className="system-card">
+          <h3>Typography</h3>
+          <p className="type-xl">League-bold display</p>
+          <p className="type-body">Compact, high-contrast UI text for quick offensive draft decisions.</p>
+        </article>
+        <article className="system-card">
+          <h3>Button styles</h3>
+          <button className="primary-cta inline">Primary CTA</button>
+          <button className="secondary-cta inline">Secondary</button>
+          <button className="draft-button">Card action</button>
+        </article>
+        <article className="system-card">
+          <h3>Player card component</h3>
+          <PlayerCard player={players[5]} disabled={false} onDraft={() => undefined} />
+        </article>
+        <article className="system-card">
+          <h3>Team/deck spin card</h3>
+          <div className="spin-card mini">
+            <div><span className="card-kicker">Team + decade</span><strong>Dallas Cowboys - 1990s</strong></div>
+          </div>
+        </article>
+        <article className="system-card">
+          <h3>Live lineup marker</h3>
+          <button className="field-marker filled static-slot">
+            <span>QB</span><strong>JM</strong><small>Set</small>
+          </button>
+        </article>
+        <article className="system-card">
+          <h3>Badge component</h3>
+          <div className="badge-row">
+            <span className="rating-badge legendary">1990s</span>
+            <span className="rating-badge elite">1980s</span>
+            <span className="rating-badge prime">2000s</span>
+            <span className="rating-badge solid">2020s</span>
+          </div>
+        </article>
+        <article className="system-card final-component">
+          <h3>Final results component</h3>
+          <strong>17-0</strong>
+          <span>Perfect Season!</span>
+        </article>
+      </div>
+      <div className="layout-notes">
+        <div><strong>Mobile layout</strong><span>Single-column draft flow with the live offense field under the war room.</span></div>
+        <div><strong>Desktop layout</strong><span>Offensive player board beside a sticky war-room and lineup field.</span></div>
+      </div>
+      <button className="primary-cta inline" onClick={onStart}>Start Draft</button>
+    </section>
+  );
+}
