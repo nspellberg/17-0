@@ -596,13 +596,13 @@ function getScore(roster: (Player | null)[]) {
 
   if (
     filled.length === rosterSlots.length &&
-    overall >= 98 &&
-    averageRating >= 97 &&
-    offense >= 98 &&
-    defense >= 95 &&
-    star >= 97 &&
-    balance >= 96 &&
-    chemistry >= 95
+    overall >= 97.5 &&
+    averageRating >= 96.5 &&
+    offense >= 97.2 &&
+    defense >= 94 &&
+    star >= 96.5 &&
+    balance >= 95 &&
+    chemistry >= 94
   ) {
     wins = 17;
   } else if (overall >= 95 && offense >= 96 && defense >= 90 && star >= 94 && balance >= 92 && chemistry >= 92) {
@@ -630,6 +630,59 @@ function ratingTone(rating: number) {
   if (rating >= 94) return "elite";
   if (rating >= 90) return "prime";
   return "solid";
+}
+
+function clampStat(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, Math.round(value)));
+}
+
+function getPlayerMetrics(player: Player) {
+  if (player.position === "QB") {
+    return [
+      { label: "Comp", value: `${clampStat(53 + (player.offense - 80) * 0.52 + (player.chemistry - 85) * 0.12, 55, 72)}%` },
+      { label: "TD", value: `${clampStat(18 + (player.star - 80) * 0.95, 18, 50)}` }
+    ];
+  }
+
+  if (player.position === "RB") {
+    return [
+      { label: "Rush", value: `${clampStat(850 + (player.offense - 82) * 34, 650, 1700)}` },
+      { label: "TD", value: `${clampStat(6 + (player.star - 82) * 0.45, 5, 20)}` }
+    ];
+  }
+
+  if (player.position === "WR") {
+    return [
+      { label: "Rec Yds", value: `${clampStat(780 + (player.offense - 82) * 28, 550, 1600)}` },
+      { label: "TD", value: `${clampStat(5 + (player.star - 82) * 0.38, 4, 18)}` }
+    ];
+  }
+
+  if (player.position === "TE") {
+    return [
+      { label: "Rec Yds", value: `${clampStat(520 + (player.offense - 80) * 20, 350, 1150)}` },
+      { label: "TD", value: `${clampStat(4 + (player.star - 80) * 0.32, 3, 15)}` }
+    ];
+  }
+
+  if (player.position === "OL") {
+    return [
+      { label: "Sacks", value: `${clampStat(9 - (player.offense - 84) * 0.16, 2, 9)}` },
+      { label: "Run", value: `${clampStat(player.offense, 80, 99)}` }
+    ];
+  }
+
+  if (player.position === "DEF") {
+    return [
+      { label: "PA/G", value: `${clampStat(24 - (player.defense - 84) * 0.34, 14, 24)}` },
+      { label: "Takeaways", value: `${clampStat(18 + (player.star - 82) * 0.55, 16, 34)}` }
+    ];
+  }
+
+  return [
+    { label: "Scrim", value: `${clampStat(700 + (player.offense - 80) * 24, 450, 1400)}` },
+    { label: "TD", value: `${clampStat(4 + (player.star - 80) * 0.32, 3, 16)}` }
+  ];
 }
 
 export default function Home() {
@@ -926,6 +979,7 @@ function getInitials(name: string) {
 
 function PlayerCard({ player, disabled, ghost, unavailable, onDraft }: { player: Player; disabled: boolean; ghost?: boolean; unavailable?: boolean; onDraft: () => void }) {
   const tone = ghost ? "locked" : ratingTone(player.rating);
+  const metrics = getPlayerMetrics(player);
 
   return (
     <article className={`player-card tone-${tone} ${ghost ? "ghost-card" : ""}`}>
@@ -935,6 +989,16 @@ function PlayerCard({ player, disabled, ghost, unavailable, onDraft }: { player:
       </div>
       <h3>{ghost ? "Spin to unlock" : player.name}</h3>
       <p>{ghost ? "A collectible player card will appear here after the reveal." : `${player.team} / ${player.decade}`}</p>
+      {!ghost && (
+        <div className="player-metrics">
+          {metrics.map((metric) => (
+            <span key={metric.label}>
+              <small>{metric.label}</small>
+              <strong>{metric.value}</strong>
+            </span>
+          ))}
+        </div>
+      )}
       <div className="stat-strip">{ghost ? "Era / role / key stats" : player.stats}</div>
       <button className="draft-button" disabled={disabled} onClick={onDraft}>{unavailable ? "Slot Filled" : "Draft Player"}</button>
     </article>

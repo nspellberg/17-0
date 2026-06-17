@@ -633,6 +633,42 @@ h3 {
   color: var(--muted);
 }
 
+.player-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.player-metrics span {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(15, 143, 81, 0.08)),
+    rgba(255, 255, 255, 0.035);
+}
+
+.player-metrics small,
+.player-metrics strong {
+  display: block;
+}
+
+.player-metrics small {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.player-metrics strong {
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .stat-strip {
   min-height: 52px;
   display: flex;
@@ -1457,6 +1493,26 @@ h3 {
 
   .player-card p {
     display: none;
+  }
+
+  .player-metrics {
+    gap: 3px;
+    margin: 0 0 5px;
+  }
+
+  .player-metrics span {
+    padding: 3px;
+    border-radius: 5px;
+  }
+
+  .player-metrics small {
+    font-size: 0.42rem;
+    line-height: 1;
+  }
+
+  .player-metrics strong {
+    margin-top: 1px;
+    font-size: 0.56rem;
   }
 
   .stat-strip {
