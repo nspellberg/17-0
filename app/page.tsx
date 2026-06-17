@@ -642,9 +642,11 @@ export default function Home() {
   const [showProjection, setShowProjection] = useState(false);
   const [teamRefreshUsed, setTeamRefreshUsed] = useState(false);
   const [decadeRefreshUsed, setDecadeRefreshUsed] = useState(false);
+  const [rolledTeams, setRolledTeams] = useState<string[]>([]);
 
   const round = Math.min(drafted.length + 1, rosterSlots.length);
   const score = useMemo(() => getScore(roster), [roster]);
+  const unusedSpinDeck = spinDeck.filter((spin) => !rolledTeams.includes(spin.team));
   const offenseOptions = currentSpin
     ? offensePlayers.filter((player) => player.team === currentSpin.team && player.decade === currentSpin.decade)
     : [];
@@ -652,7 +654,7 @@ export default function Home() {
     ? [...offenseOptions, getTeamDefense(currentSpin)].filter((player) => !drafted.some((draftedPlayer) => draftedPlayer.id === player.id))
     : [];
   const teamRefreshOptions = currentSpin
-    ? spinDeck.filter((spin) => spin.decade === currentSpin.decade && spin.team !== currentSpin.team)
+    ? spinDeck.filter((spin) => spin.decade === currentSpin.decade && spin.team !== currentSpin.team && !rolledTeams.includes(spin.team))
     : [];
   const decadeRefreshOptions = currentSpin
     ? spinDeck.filter((spin) => spin.team === currentSpin.team && spin.decade !== currentSpin.decade)
@@ -679,13 +681,19 @@ export default function Home() {
     setShowProjection(false);
     setTeamRefreshUsed(false);
     setDecadeRefreshUsed(false);
+    setRolledTeams([]);
     setScreen(useExample ? "rating" : "draft");
+  }
+
+  function revealSpin(spin: Spin) {
+    setCurrentSpin(spin);
+    setRolledTeams((teams) => (teams.includes(spin.team) ? teams : [...teams, spin.team]));
   }
 
   function spinTeam() {
     setIsSpinning(true);
     window.setTimeout(() => {
-      setCurrentSpin(randomFrom(spinDeck));
+      revealSpin(randomFrom(unusedSpinDeck.length ? unusedSpinDeck : spinDeck));
       setIsSpinning(false);
     }, 680);
   }
@@ -693,14 +701,14 @@ export default function Home() {
   function refreshTeam() {
     if (!currentSpin || teamRefreshUsed || drafted.length >= rosterSlots.length) return;
     if (!teamRefreshOptions.length) return;
-    setCurrentSpin(randomFrom(teamRefreshOptions));
+    revealSpin(randomFrom(teamRefreshOptions));
     setTeamRefreshUsed(true);
   }
 
   function refreshDecade() {
     if (!currentSpin || decadeRefreshUsed || drafted.length >= rosterSlots.length) return;
     if (!decadeRefreshOptions.length) return;
-    setCurrentSpin(randomFrom(decadeRefreshOptions));
+    revealSpin(randomFrom(decadeRefreshOptions));
     setDecadeRefreshUsed(true);
   }
 
@@ -714,14 +722,6 @@ export default function Home() {
     }
     setCurrentSpin(null);
     if (drafted.length + 1 >= rosterSlots.length) setScreen("rating");
-  }
-
-  function clearSlot(slotIndex: number) {
-    const removedPlayer = roster[slotIndex];
-    setRoster((items) => items.map((slotPlayer, index) => (index === slotIndex ? null : slotPlayer)));
-    if (removedPlayer) {
-      setDrafted((items) => items.filter((player) => player.id !== removedPlayer.id));
-    }
   }
 
   const navItems: { key: Screen; label: string }[] = [
@@ -804,7 +804,16 @@ export default function Home() {
             <div className={`spin-card ${isSpinning ? "spinning" : ""}`}>
               <div>
                 <span className="card-kicker">Team + decade</span>
-                <strong>{isSpinning ? "Finding a matchup..." : currentSpin ? `${currentSpin.team} - ${currentSpin.decade}` : "Ready to reveal"}</strong>
+                <div className="spin-result">
+                  <div className="spin-result-box">
+                    <span>Team</span>
+                    <strong>{isSpinning ? "Rolling..." : currentSpin ? currentSpin.team : "Ready"}</strong>
+                  </div>
+                  <div className="spin-result-box">
+                    <span>Decade</span>
+                    <strong>{isSpinning ? "Rolling..." : currentSpin ? currentSpin.decade : "Reveal"}</strong>
+                  </div>
+                </div>
               </div>
               <div className="spin-actions">
                 <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || drafted.length >= rosterSlots.length}>
@@ -830,7 +839,7 @@ export default function Home() {
                 onToggleProjection={() => setShowProjection((value) => !value)}
                 onReveal={() => setScreen("rating")}
               />
-              <LiveLineup roster={roster} onClear={clearSlot} />
+              <LiveLineup roster={roster} />
             </div>
 
             <div className="list-heading">
@@ -859,7 +868,7 @@ export default function Home() {
               onToggleProjection={() => setShowProjection((value) => !value)}
               onReveal={() => setScreen("rating")}
             />
-            <LiveLineup roster={roster} onClear={clearSlot} />
+            <LiveLineup roster={roster} />
           </aside>
         </section>
       )}
@@ -889,6 +898,7 @@ export default function Home() {
           <p className="eyebrow">Final results</p>
           <h2>{score.wins === 17 ? "Perfect Season!" : "Great Team, But Not Perfect"}</h2>
           <strong>{score.wins}-{score.losses}</strong>
+          <FinalRoster roster={roster} />
           <div className="trophy" aria-hidden="true" />
           <div className="result-actions">
             <button className="primary-cta" onClick={() => resetGame(false)}>Draft Again</button>
@@ -965,7 +975,7 @@ function ProgressPanel({
   );
 }
 
-function LiveLineup({ roster, onClear }: { roster: (Player | null)[]; onClear: (slotIndex: number) => void }) {
+function LiveLineup({ roster }: { roster: (Player | null)[] }) {
   return (
     <div className="live-lineup-card">
       <div className="panel-title">
@@ -976,20 +986,42 @@ function LiveLineup({ roster, onClear }: { roster: (Player | null)[]; onClear: (
         {rosterSlots.map((slot, index) => {
           const player = roster[index];
           return (
-            <button
+            <div
               className={`field-marker ${player ? "filled" : ""} slot-${index}`}
               key={`${slot}-${index}`}
-              onClick={() => player && onClear(index)}
               aria-label={player ? `${slot}: ${player.name}` : `${slot}: empty`}
             >
               <span>{slot}</span>
               <strong>{player ? getInitials(player.name) : "+"}</strong>
               <small>{player ? "Set" : "Open"}</small>
-            </button>
+            </div>
           );
         })}
       </div>
-      <p className="hint">Tap a filled spot to clear it if you want to reopen that position.</p>
+      <p className="hint">Picks lock into the first open matching position.</p>
+    </div>
+  );
+}
+
+function FinalRoster({ roster }: { roster: (Player | null)[] }) {
+  return (
+    <div className="final-roster-card">
+      <div className="panel-title">
+        <span>Final roster</span>
+        <strong>{roster.filter(Boolean).length}/{rosterSlots.length}</strong>
+      </div>
+      <div className="final-roster-grid">
+        {rosterSlots.map((slot, index) => {
+          const player = roster[index];
+          return (
+            <div className="final-roster-player" key={`${slot}-${index}`}>
+              <span>{slot}</span>
+              <strong>{player ? player.name : "Empty"}</strong>
+              <small>{player ? `${player.team} / ${player.decade}` : "No pick"}</small>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

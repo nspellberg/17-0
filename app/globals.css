@@ -407,6 +407,36 @@ h3 {
   line-height: 1;
 }
 
+.spin-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(110px, 0.7fr);
+  gap: 10px;
+}
+
+.spin-result-box {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(15, 143, 81, 0.08)),
+    rgba(3, 6, 12, 0.32);
+}
+
+.spin-result-box span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.spin-result-box strong {
+  overflow-wrap: anywhere;
+}
+
 .spin-actions {
   display: grid;
   gap: 10px;
@@ -977,6 +1007,48 @@ h3 {
   text-shadow: 0 0 52px rgba(213, 161, 30, 0.3);
 }
 
+.final-roster-card {
+  width: min(900px, 100%);
+  margin: 18px auto 8px;
+  padding: 16px;
+  border: 1px solid rgba(213, 161, 30, 0.24);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(213, 161, 30, 0.14), transparent 42%),
+    rgba(255, 255, 255, 0.055);
+}
+
+.final-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.final-roster-player {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(3, 6, 12, 0.42);
+  text-align: left;
+}
+
+.final-roster-player span,
+.final-roster-player small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.final-roster-player strong {
+  display: block;
+  margin: 5px 0;
+  line-height: 1.08;
+  font-size: 0.94rem;
+}
+
 .trophy {
   position: relative;
   width: 88px;
@@ -1295,6 +1367,29 @@ h3 {
     line-height: 0.98;
   }
 
+  .spin-result {
+    grid-template-columns: 1fr 0.7fr;
+    gap: 6px;
+  }
+
+  .spin-result-box {
+    padding: 8px;
+  }
+
+  .spin-result-box span {
+    margin-bottom: 4px;
+    font-size: 0.55rem;
+  }
+
+  .spin-result-box strong {
+    display: -webkit-box;
+    font-size: 0.88rem;
+    line-height: 1;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   .card-kicker {
     font-size: 0.62rem;
     margin-bottom: 4px;
@@ -1536,6 +1631,31 @@ h3 {
     min-height: auto;
     padding: 20px 0;
   }
+
+  .final-roster-card {
+    margin: 10px auto 4px;
+    padding: 10px;
+  }
+
+  .final-roster-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .final-roster-player {
+    padding: 7px;
+  }
+
+  .final-roster-player span,
+  .final-roster-player small {
+    font-size: 0.58rem;
+  }
+
+  .final-roster-player strong {
+    margin: 3px 0;
+    font-size: 0.72rem;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1553,6 +1673,10 @@ h3 {
 
   .spin-card strong {
     font-size: clamp(1rem, 5.8vw, 1.35rem);
+  }
+
+  .spin-result-box strong {
+    font-size: 0.78rem;
   }
 
   .reroll-actions {
