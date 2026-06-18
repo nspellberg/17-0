@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useMemo, useState } from "react";
 
 type Screen = "home" | "how" | "draft" | "rating" | "results" | "system";
@@ -816,6 +817,14 @@ function randomFrom<T>(items: T[]) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+function trackGameEvent(event: string, data?: Record<string, string | number | boolean>) {
+  try {
+    track(event, data);
+  } catch {
+    // Analytics should never get in the way of the game.
+  }
+}
+
 function getDefenseProfile(team: string, decade: string) {
   const exact = defenseRatings[`${team}-${decade}`];
   if (exact) return exact;
@@ -1029,7 +1038,7 @@ export default function Home() {
   const isRosterComplete = roster.every(Boolean);
   const hasOpenSlot = (player: Player) => roster.some((slotPlayer, index) => !slotPlayer && canFill(rosterSlots[index], player));
 
-  function resetGame(useExample = false) {
+  function resetGame(useExample = false, source = "button") {
     const nextRoster = Array(rosterSlots.length).fill(null) as (Player | null)[];
     const nextDrafted = useExample ? [...exampleRoster] : [];
 
@@ -1052,6 +1061,7 @@ export default function Home() {
     setResultsUnlocked(false);
     setShareStatus("idle");
     setScreen(useExample ? "rating" : "draft");
+    trackGameEvent(useExample ? "Example Team Viewed" : "Draft Started", { source });
   }
 
   function revealSpin(spin: Spin) {
@@ -1062,38 +1072,84 @@ export default function Home() {
   function spinTeam() {
     setIsSpinning(true);
     window.setTimeout(() => {
-      revealSpin(randomFrom(unusedSpinDeck.length ? unusedSpinDeck : spinDeck));
+      const nextSpin = randomFrom(unusedSpinDeck.length ? unusedSpinDeck : spinDeck);
+      revealSpin(nextSpin);
       setIsSpinning(false);
+      trackGameEvent("Team Decade Spun", {
+        team: nextSpin.team,
+        decade: nextSpin.decade,
+        round,
+        remaining_slots: rosterSlots.length - drafted.length
+      });
     }, 680);
   }
 
   function refreshTeam() {
     if (!currentSpin || teamRefreshUsed || drafted.length >= rosterSlots.length) return;
     if (!teamRefreshOptions.length) return;
-    revealSpin(randomFrom(teamRefreshOptions));
+    const nextSpin = randomFrom(teamRefreshOptions);
+    revealSpin(nextSpin);
     setTeamRefreshUsed(true);
+    trackGameEvent("Team Refreshed", {
+      from_team: currentSpin.team,
+      to_team: nextSpin.team,
+      decade: nextSpin.decade,
+      round
+    });
   }
 
   function refreshDecade() {
     if (!currentSpin || decadeRefreshUsed || drafted.length >= rosterSlots.length) return;
     if (!decadeRefreshOptions.length) return;
-    revealSpin(randomFrom(decadeRefreshOptions));
+    const nextSpin = randomFrom(decadeRefreshOptions);
+    revealSpin(nextSpin);
     setDecadeRefreshUsed(true);
+    trackGameEvent("Decade Refreshed", {
+      team: nextSpin.team,
+      from_decade: currentSpin.decade,
+      to_decade: nextSpin.decade,
+      round
+    });
   }
 
   function draftPlayer(player: Player) {
     if (drafted.length >= rosterSlots.length || drafted.some((draftedPlayer) => draftedPlayer.id === player.id)) return;
     const openIndex = roster.findIndex((slotPlayer, index) => !slotPlayer && canFill(rosterSlots[index], player));
     if (openIndex < 0) return;
+    const nextDraftedCount = drafted.length + 1;
+    const nextRoster = roster.map((slotPlayer, index) => (index === openIndex ? player : slotPlayer));
+    const nextScore = getScore(nextRoster);
     setDrafted((items) => [...items, player]);
     if (openIndex >= 0) {
       setRoster((items) => items.map((slotPlayer, index) => (index === openIndex ? player : slotPlayer)));
     }
     setCurrentSpin(null);
-    if (drafted.length + 1 >= rosterSlots.length) setScreen("rating");
+    trackGameEvent("Player Drafted", {
+      team: player.team,
+      decade: player.decade,
+      position: player.position,
+      slot: rosterSlots[openIndex],
+      round: nextDraftedCount
+    });
+    if (nextDraftedCount >= rosterSlots.length) {
+      trackGameEvent("Draft Completed", {
+        wins: nextScore.wins,
+        losses: nextScore.losses,
+        perfect: nextScore.wins === 17
+      });
+      setScreen("rating");
+    }
   }
 
   function goToResults() {
+    if (!resultsUnlocked) {
+      trackGameEvent("Final Results Viewed", {
+        wins: score.wins,
+        losses: score.losses,
+        perfect: score.wins === 17,
+        overall_score: score.overall
+      });
+    }
     setResultsUnlocked(true);
     setScreen("results");
   }
@@ -1110,19 +1166,57 @@ export default function Home() {
     try {
       if (navigator.share) {
         await navigator.share({ title: "My 17-0 team", text });
+        trackGameEvent("Lineup Shared", {
+          method: "native_share",
+          wins: score.wins,
+          losses: score.losses,
+          perfect: score.wins === 17
+        });
         return;
       }
 
       await navigator.clipboard?.writeText(text);
       setShareStatus("copied");
       window.setTimeout(() => setShareStatus("idle"), 1800);
+      trackGameEvent("Lineup Shared", {
+        method: "clipboard",
+        wins: score.wins,
+        losses: score.losses,
+        perfect: score.wins === 17
+      });
     } catch {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(text);
         setShareStatus("copied");
         window.setTimeout(() => setShareStatus("idle"), 1800);
+        trackGameEvent("Lineup Shared", {
+          method: "clipboard_fallback",
+          wins: score.wins,
+          losses: score.losses,
+          perfect: score.wins === 17
+        });
       }
     }
+  }
+
+  function saveTeam() {
+    setSaved(true);
+    if (!saved) {
+      trackGameEvent("Team Saved", {
+        wins: score.wins,
+        losses: score.losses,
+        perfect: score.wins === 17
+      });
+    }
+  }
+
+  function viewLineupFromResults() {
+    trackGameEvent("Final Lineup Viewed", {
+      wins: score.wins,
+      losses: score.losses,
+      perfect: score.wins === 17
+    });
+    setScreen("draft");
   }
 
   const navItems: { key: Screen; label: string }[] = [
@@ -1145,7 +1239,7 @@ export default function Home() {
             </button>
           ))}
         </nav>
-        <button className="small-action" onClick={() => resetGame(false)}>New Draft</button>
+        <button className="small-action" onClick={() => resetGame(false, "topbar")}>New Draft</button>
       </header>
 
       {screen === "home" && (
@@ -1156,9 +1250,9 @@ export default function Home() {
             <h1>17-0</h1>
             <p className="hero-copy">Build the ultimate NFL all-time team and see if you can go undefeated.</p>
             <div className="hero-actions">
-              <button className="primary-cta" onClick={() => resetGame(false)}>Start Draft</button>
+              <button className="primary-cta" onClick={() => resetGame(false, "home")}>Start Draft</button>
               <button className="secondary-cta" onClick={() => setScreen("how")}>How to Play</button>
-              <button className="secondary-cta" onClick={() => resetGame(true)}>View Example Team</button>
+              <button className="secondary-cta" onClick={() => resetGame(true, "home")}>View Example Team</button>
             </div>
           </div>
           <div className="hero-scoreboard">
@@ -1189,7 +1283,7 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <button className="primary-cta inline" onClick={() => resetGame(false)}>Start Draft</button>
+          <button className="primary-cta inline" onClick={() => resetGame(false, "how_to_play")}>Start Draft</button>
         </section>
       )}
 
@@ -1304,15 +1398,15 @@ export default function Home() {
           <FinalRoster roster={roster} />
           <div className="trophy" aria-hidden="true" />
           <div className="result-actions">
-            <button className="primary-cta" onClick={() => resetGame(false)}>Draft Again</button>
+            <button className="primary-cta" onClick={() => resetGame(false, "results")}>Draft Again</button>
             <button className="secondary-cta" onClick={() => void shareTeam()}>{shareStatus === "copied" ? "Copied Lineup" : "Share Lineup"}</button>
-            <button className="secondary-cta" onClick={() => setSaved(true)}>{saved ? "Team Saved" : "Save Team"}</button>
-            <button className="secondary-cta" onClick={() => setScreen("draft")}>View Lineup</button>
+            <button className="secondary-cta" onClick={saveTeam}>{saved ? "Team Saved" : "Save Team"}</button>
+            <button className="secondary-cta" onClick={viewLineupFromResults}>View Lineup</button>
           </div>
         </section>
       )}
 
-      {screen === "system" && <DesignSystem onStart={() => resetGame(false)} />}
+      {screen === "system" && <DesignSystem onStart={() => resetGame(false, "design_system")} />}
     </main>
   );
 }
