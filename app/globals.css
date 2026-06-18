@@ -1324,10 +1324,13 @@ h3 {
   }
 
   .hero-actions,
-  .result-actions,
   .spin-card {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .hero-actions {
+    gap: 8px;
   }
 
   .spin-actions {
@@ -1685,22 +1688,32 @@ h3 {
   .results-screen {
     width: min(100% - 16px, 520px);
     min-height: auto;
-    padding: 20px 0;
+    padding: 10px 0 14px;
+  }
+
+  .results-screen .eyebrow {
+    margin-bottom: 4px;
+    font-size: 0.6rem;
+  }
+
+  .results-screen h2 {
+    margin-bottom: 2px;
+    font-size: clamp(1.35rem, 7vw, 2rem);
   }
 
   .final-roster-card {
-    margin: 10px auto 4px;
-    padding: 10px;
+    margin: 6px auto 2px;
+    padding: 8px;
   }
 
   .final-roster-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 8px;
+    gap: 5px;
+    margin-top: 6px;
   }
 
   .final-roster-player {
-    padding: 7px;
+    padding: 6px;
   }
 
   .final-roster-player span,
@@ -1711,6 +1724,32 @@ h3 {
   .final-roster-player strong {
     margin: 3px 0;
     font-size: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trophy {
+    display: none;
+  }
+
+  .result-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .result-actions .primary-cta,
+  .result-actions .secondary-cta {
+    min-height: 38px;
+    padding: 0 8px;
+    font-size: 0.74rem;
+  }
+
+  .result-actions .primary-cta {
+    grid-column: span 2;
   }
 }
 

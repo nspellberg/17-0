@@ -1018,7 +1018,7 @@ export default function Home() {
   const [decadeRefreshUsed, setDecadeRefreshUsed] = useState(false);
   const [rolledTeams, setRolledTeams] = useState<string[]>([]);
   const [resultsUnlocked, setResultsUnlocked] = useState(false);
-  const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
+  const [shareStatus, setShareStatus] = useState<"idle" | "shared" | "copied" | "failed">("idle");
 
   const round = Math.min(drafted.length + 1, rosterSlots.length);
   const score = useMemo(() => getScore(roster), [roster]);
@@ -1155,17 +1155,24 @@ export default function Home() {
   }
 
   async function shareTeam() {
+    const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://17-0-ruby.vercel.app";
     const rosterText = rosterSlots
       .map((slot, index) => {
         const player = roster[index];
         return `${slot}: ${player ? `${player.name} (${player.team}, ${player.decade})` : "Empty"}`;
       })
       .join("\n");
-    const text = `My 17-0 draft team went ${score.wins}-${score.losses}!\n\n${rosterText}`;
+    const text = `My 17-0 draft team went ${score.wins}-${score.losses}.\nCan you beat it?\n\n${rosterText}\n\nPlay 17-0: ${shareUrl}`;
 
     try {
       if (navigator.share) {
-        await navigator.share({ title: "My 17-0 team", text });
+        await navigator.share({
+          title: `My 17-0 team went ${score.wins}-${score.losses}`,
+          text,
+          url: shareUrl
+        });
+        setShareStatus("shared");
+        window.setTimeout(() => setShareStatus("idle"), 1800);
         trackGameEvent("Lineup Shared", {
           method: "native_share",
           wins: score.wins,
@@ -1195,9 +1202,14 @@ export default function Home() {
           losses: score.losses,
           perfect: score.wins === 17
         });
+      } else {
+        setShareStatus("failed");
+        window.setTimeout(() => setShareStatus("idle"), 2200);
       }
     }
   }
+
+  const shareLabel = shareStatus === "shared" ? "Shared" : shareStatus === "copied" ? "Copied Challenge" : shareStatus === "failed" ? "Share Unavailable" : "Share Challenge";
 
   function saveTeam() {
     setSaved(true);
@@ -1399,7 +1411,7 @@ export default function Home() {
           <div className="trophy" aria-hidden="true" />
           <div className="result-actions">
             <button className="primary-cta" onClick={() => resetGame(false, "results")}>Draft Again</button>
-            <button className="secondary-cta" onClick={() => void shareTeam()}>{shareStatus === "copied" ? "Copied Lineup" : "Share Lineup"}</button>
+            <button className="secondary-cta" onClick={() => void shareTeam()}>{shareLabel}</button>
             <button className="secondary-cta" onClick={saveTeam}>{saved ? "Team Saved" : "Save Team"}</button>
             <button className="secondary-cta" onClick={viewLineupFromResults}>View Lineup</button>
           </div>
