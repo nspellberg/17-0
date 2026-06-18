@@ -456,6 +456,318 @@ const expandedRosterSeeds: OffenseSeed[] = [
       ["Orlando Pace", "OL", "Hall of Fame tackle", 99, 100, 97, 95],
       ["Az-Zahir Hakim", "FLEX", "Slot explosive piece", 86, 89, 84, 88]
     ]
+  },
+  {
+    team: "San Francisco 49ers",
+    decade: "1990s",
+    cards: [
+      ["Steve Young", "QB", "MVP dual-threat passer", 99, 100, 99, 96],
+      ["Ricky Watters", "RB", "Versatile title back", 90, 93, 88, 92],
+      ["Jerry Rice", "WR", "Prime record-breaker", 100, 100, 100, 97],
+      ["Terrell Owens", "WR", "Young explosive target", 92, 95, 92, 88],
+      ["Jesse Sapolu", "OL", "Multi-ring line anchor", 91, 93, 87, 95],
+      ["Brent Jones", "TE", "Four-time Pro Bowl TE", 91, 93, 88, 95]
+    ]
+  },
+  {
+    team: "Pittsburgh Steelers",
+    decade: "2000s",
+    cards: [
+      ["Ben Roethlisberger", "QB", "Two-ring play extender", 94, 96, 93, 93],
+      ["Jerome Bettis", "RB", "Power title finisher", 91, 92, 91, 94],
+      ["Hines Ward", "WR", "Physical Super Bowl MVP", 92, 94, 90, 96],
+      ["Santonio Holmes", "WR", "Toe-tap playoff hero", 88, 91, 88, 89],
+      ["Alan Faneca", "OL", "Hall of Fame guard", 98, 99, 95, 96],
+      ["Heath Miller", "TE", "Reliable complete TE", 88, 90, 84, 94]
+    ]
+  },
+  {
+    team: "Chicago Bears",
+    decade: "2000s",
+    cards: [
+      ["Jay Cutler", "QB", "Big-arm creator", 84, 87, 84, 82],
+      ["Matt Forte", "RB", "All-purpose workhorse", 92, 95, 90, 91],
+      ["Brandon Marshall", "WR", "Contested-catch monster", 94, 96, 94, 88],
+      ["Alshon Jeffery", "WR", "Boundary jump-ball target", 88, 91, 86, 87],
+      ["Olin Kreutz", "OL", "Six-time Pro Bowl center", 93, 95, 89, 93],
+      ["Greg Olsen", "TE", "Young receiving TE", 87, 90, 84, 86]
+    ]
+  },
+  {
+    team: "Baltimore Ravens",
+    decade: "2010s",
+    cards: [
+      ["Lamar Jackson", "QB", "Unanimous MVP runner", 99, 100, 100, 90],
+      ["Ray Rice", "RB", "Receiving-back engine", 91, 94, 88, 90],
+      ["Anquan Boldin", "WR", "Playoff possession force", 90, 92, 88, 92],
+      ["Torrey Smith", "WR", "Vertical field stretcher", 86, 89, 84, 86],
+      ["Marshal Yanda", "OL", "Hall-level guard", 98, 99, 94, 96],
+      ["Mark Andrews", "TE", "Red-zone chain mover", 92, 94, 90, 91]
+    ]
+  },
+  {
+    team: "Indianapolis Colts",
+    decade: "2010s",
+    cards: [
+      ["Andrew Luck", "QB", "High-end comeback passer", 94, 96, 94, 90],
+      ["Jonathan Taylor", "RB", "Late-decade rushing star", 93, 96, 92, 88],
+      ["T.Y. Hilton", "WR", "Explosive deep separator", 92, 95, 90, 91],
+      ["Reggie Wayne", "WR", "Veteran route master", 91, 93, 89, 93],
+      ["Quenton Nelson", "OL", "Instant All-Pro guard", 98, 99, 95, 94],
+      ["Jack Doyle", "TE", "Reliable underneath TE", 84, 86, 80, 90]
+    ]
+  },
+  {
+    team: "Miami Dolphins",
+    decade: "1980s",
+    cards: [
+      ["Dan Marino", "QB", "Record-shattering passer", 100, 100, 100, 92],
+      ["Tony Nathan", "RB", "Receiving back weapon", 87, 90, 84, 91],
+      ["Mark Duper", "WR", "Marks Brother speed", 92, 95, 90, 91],
+      ["Mark Clayton", "WR", "Touchdown machine", 93, 96, 91, 92],
+      ["Dwight Stephenson", "OL", "All-time center", 99, 100, 97, 95],
+      ["Bruce Hardy", "TE", "Steady Marino target", 83, 85, 79, 90]
+    ]
+  },
+  {
+    team: "Minnesota Vikings",
+    decade: "2000s",
+    cards: [
+      ["Daunte Culpepper", "QB", "Peak power passer", 92, 95, 92, 87],
+      ["Adrian Peterson", "RB", "MVP rushing force", 100, 100, 100, 90],
+      ["Randy Moss", "WR", "Early-decade alien", 98, 100, 99, 89],
+      ["Percy Harvin", "WR", "Gadget speed weapon", 88, 91, 88, 86],
+      ["Steve Hutchinson", "OL", "Hall of Fame guard", 98, 99, 95, 95],
+      ["Visanthe Shiancoe", "TE", "Red-zone tight end", 83, 85, 79, 87]
+    ]
+  },
+  {
+    team: "Detroit Lions",
+    decade: "2020s",
+    cards: [
+      ["Jared Goff", "QB", "Rhythm playoff passer", 91, 93, 88, 94],
+      ["Jahmyr Gibbs", "RB", "Explosive space back", 91, 94, 91, 90],
+      ["Amon-Ra St. Brown", "WR", "Slot alpha receiver", 96, 98, 95, 95],
+      ["Jameson Williams", "WR", "Field-tilting speed", 86, 90, 86, 84],
+      ["Penei Sewell", "OL", "Elite tone-setting tackle", 98, 99, 95, 96],
+      ["Sam LaPorta", "TE", "Instant-impact tight end", 91, 93, 88, 91]
+    ]
+  },
+  {
+    team: "Las Vegas Raiders",
+    decade: "1980s",
+    cards: [
+      ["Jim Plunkett", "QB", "Two-time champion passer", 88, 90, 88, 92],
+      ["Marcus Allen", "RB", "MVP do-it-all back", 98, 99, 98, 95],
+      ["Tim Brown", "WR", "Young Hall of Fame spark", 90, 93, 89, 88],
+      ["Todd Christensen", "TE", "All-Pro receiving TE", 94, 96, 92, 93],
+      ["Don Mosebar", "OL", "Pro Bowl center", 90, 92, 86, 91],
+      ["Bo Jackson", "FLEX", "Mythic power-speed wildcard", 94, 97, 98, 84]
+    ]
+  },
+  {
+    team: "Denver Broncos",
+    decade: "2010s",
+    cards: [
+      ["Peyton Manning", "QB", "Record-setting MVP commander", 99, 100, 100, 96],
+      ["C.J. Anderson", "RB", "Playoff power runner", 86, 88, 84, 90],
+      ["Demaryius Thomas", "WR", "YAC boundary star", 94, 96, 93, 92],
+      ["Emmanuel Sanders", "WR", "Precise vertical WR2", 90, 92, 88, 92],
+      ["Ryan Clady", "OL", "All-Pro left tackle", 94, 96, 91, 92],
+      ["Julius Thomas", "TE", "Touchdown tight end", 88, 91, 86, 87]
+    ]
+  },
+  {
+    team: "New York Giants",
+    decade: "2000s",
+    cards: [
+      ["Eli Manning", "QB", "Two-ring playoff passer", 91, 92, 92, 94],
+      ["Tiki Barber", "RB", "All-purpose rushing star", 93, 95, 91, 90],
+      ["Plaxico Burress", "WR", "Title-game jump-ball target", 89, 91, 87, 90],
+      ["Amani Toomer", "WR", "Reliable franchise receiver", 87, 89, 83, 91],
+      ["Chris Snee", "OL", "Pro Bowl mauler", 91, 93, 87, 93],
+      ["Jeremy Shockey", "TE", "Fiery receiving TE", 88, 90, 86, 88]
+    ]
+  },
+  {
+    team: "Philadelphia Eagles",
+    decade: "2010s",
+    cards: [
+      ["Nick Foles", "QB", "Super Bowl run flamethrower", 88, 91, 90, 92],
+      ["LeSean McCoy", "RB", "Cutback rushing artist", 96, 98, 95, 89],
+      ["DeSean Jackson", "WR", "Deep-ball nightmare", 92, 95, 92, 87],
+      ["Alshon Jeffery", "WR", "Playoff possession target", 88, 90, 86, 90],
+      ["Jason Peters", "OL", "Hall-level left tackle", 98, 99, 95, 95],
+      ["Zach Ertz", "TE", "Record-catch tight end", 94, 96, 92, 94]
+    ]
+  },
+  {
+    team: "Washington Commanders",
+    decade: "2010s",
+    cards: [
+      ["Kirk Cousins", "QB", "Efficient rhythm passer", 88, 90, 85, 88],
+      ["Alfred Morris", "RB", "Zone-run workhorse", 88, 90, 84, 90],
+      ["DeSean Jackson", "WR", "Vertical lid-lifter", 90, 93, 90, 86],
+      ["Pierre Garcon", "WR", "Tough chain mover", 87, 89, 83, 90],
+      ["Trent Williams", "OL", "Elite left tackle", 99, 100, 96, 94],
+      ["Jordan Reed", "TE", "Route-running mismatch", 91, 94, 89, 86]
+    ]
+  },
+  {
+    team: "Seattle Seahawks",
+    decade: "2000s",
+    cards: [
+      ["Matt Hasselbeck", "QB", "West Coast Pro Bowler", 89, 91, 86, 91],
+      ["Shaun Alexander", "RB", "MVP touchdown machine", 96, 98, 96, 92],
+      ["Darrell Jackson", "WR", "Reliable WR1", 86, 88, 82, 89],
+      ["Bobby Engram", "WR", "Slot chain mover", 84, 86, 80, 90],
+      ["Walter Jones", "OL", "All-time left tackle", 100, 100, 98, 96],
+      ["Jerramy Stevens", "TE", "Red-zone target", 82, 84, 78, 86]
+    ]
+  },
+  {
+    team: "Arizona Cardinals",
+    decade: "2010s",
+    cards: [
+      ["Carson Palmer", "QB", "Deep-shot MVP candidate", 91, 94, 89, 90],
+      ["David Johnson", "RB", "1,000/800 weapon", 94, 97, 93, 88],
+      ["Larry Fitzgerald", "WR", "Late-prime slot legend", 95, 97, 95, 96],
+      ["Michael Floyd", "WR", "Big-play boundary WR", 84, 87, 82, 85],
+      ["D.J. Humphries", "OL", "Steady left tackle", 86, 88, 82, 87],
+      ["John Brown", "FLEX", "Vertical speed spark", 84, 87, 83, 85]
+    ]
+  },
+  {
+    team: "Tampa Bay Buccaneers",
+    decade: "2000s",
+    cards: [
+      ["Brad Johnson", "QB", "Efficient title passer", 86, 88, 84, 93],
+      ["Warrick Dunn", "RB", "Explosive all-purpose back", 89, 92, 86, 90],
+      ["Keyshawn Johnson", "WR", "Physical possession WR", 88, 90, 86, 90],
+      ["Joey Galloway", "WR", "Speed veteran target", 87, 90, 84, 87],
+      ["Jeff Christy", "OL", "Pro Bowl center", 88, 90, 84, 91],
+      ["Mike Alstott", "FLEX", "Power fullback icon", 89, 91, 88, 94]
+    ]
+  },
+  {
+    team: "New Orleans Saints",
+    decade: "2010s",
+    cards: [
+      ["Drew Brees", "QB", "Precision volume master", 99, 100, 99, 98],
+      ["Alvin Kamara", "RB", "Space-scoring weapon", 96, 99, 96, 94],
+      ["Michael Thomas", "WR", "Catch-record receiver", 97, 99, 96, 95],
+      ["Brandin Cooks", "WR", "Vertical separator", 89, 92, 88, 88],
+      ["Terron Armstead", "OL", "Elite left tackle", 95, 97, 92, 94],
+      ["Jimmy Graham", "TE", "Red-zone mismatch", 96, 98, 96, 92]
+    ]
+  },
+  {
+    team: "Atlanta Falcons",
+    decade: "2000s",
+    cards: [
+      ["Michael Vick", "QB", "Electric rushing QB", 96, 97, 99, 85],
+      ["Warrick Dunn", "RB", "Explosive outside runner", 89, 92, 86, 89],
+      ["Roddy White", "WR", "Emerging franchise WR", 90, 92, 88, 90],
+      ["Peerless Price", "WR", "Speed complement", 82, 84, 79, 84],
+      ["Todd McClure", "OL", "Long-time line anchor", 87, 89, 83, 91],
+      ["Alge Crumpler", "TE", "Pro Bowl tight end", 91, 93, 88, 90]
+    ]
+  },
+  {
+    team: "Carolina Panthers",
+    decade: "2000s",
+    cards: [
+      ["Jake Delhomme", "QB", "Super Bowl run passer", 87, 89, 84, 91],
+      ["DeAngelo Williams", "RB", "Big-play rushing star", 91, 94, 89, 88],
+      ["Steve Smith Sr.", "WR", "Triple-crown firestarter", 98, 99, 98, 91],
+      ["Muhsin Muhammad", "WR", "Physical scoring WR", 90, 92, 87, 91],
+      ["Jordan Gross", "OL", "Pro Bowl left tackle", 92, 94, 88, 92],
+      ["Wesley Walls", "TE", "Veteran receiving TE", 86, 88, 83, 88]
+    ]
+  },
+  {
+    team: "Cincinnati Bengals",
+    decade: "2000s",
+    cards: [
+      ["Carson Palmer", "QB", "Big-arm Pro Bowl passer", 91, 93, 89, 87],
+      ["Rudi Johnson", "RB", "Volume power back", 87, 89, 83, 88],
+      ["Chad Johnson", "WR", "Route-showman superstar", 96, 98, 96, 88],
+      ["T.J. Houshmandzadeh", "WR", "Possession WR2", 89, 91, 85, 90],
+      ["Willie Anderson", "OL", "Elite right tackle", 96, 98, 92, 91],
+      ["Chris Henry", "FLEX", "Vertical scoring threat", 83, 86, 82, 82]
+    ]
+  },
+  {
+    team: "Cleveland Browns",
+    decade: "1980s",
+    cards: [
+      ["Bernie Kosar", "QB", "Playoff rhythm passer", 90, 92, 88, 92],
+      ["Kevin Mack", "RB", "Power running back", 87, 89, 84, 90],
+      ["Webster Slaughter", "WR", "Explosive outside WR", 88, 91, 85, 88],
+      ["Ozzie Newsome", "TE", "Hall of Fame tight end", 96, 98, 94, 95],
+      ["Mike Baab", "OL", "Pro Bowl center", 87, 89, 83, 90],
+      ["Earnest Byner", "FLEX", "All-purpose back", 88, 90, 85, 91]
+    ]
+  },
+  {
+    team: "New York Jets",
+    decade: "2000s",
+    cards: [
+      ["Chad Pennington", "QB", "Accurate timing passer", 87, 89, 83, 91],
+      ["Curtis Martin", "RB", "Rushing-title workhorse", 96, 97, 94, 94],
+      ["Laveranues Coles", "WR", "Tough separator", 88, 90, 84, 89],
+      ["Santonio Holmes", "WR", "Clutch playoff target", 86, 88, 84, 88],
+      ["Nick Mangold", "OL", "All-Pro center", 96, 98, 92, 94],
+      ["Dustin Keller", "TE", "Receiving tight end", 84, 86, 80, 87]
+    ]
+  },
+  {
+    team: "Los Angeles Chargers",
+    decade: "2010s",
+    cards: [
+      ["Philip Rivers", "QB", "Veteran volume passer", 92, 94, 89, 90],
+      ["Melvin Gordon", "RB", "Touchdown workhorse", 88, 91, 86, 88],
+      ["Keenan Allen", "WR", "Route-running technician", 95, 97, 94, 92],
+      ["Mike Williams", "WR", "Contested-catch threat", 87, 90, 85, 86],
+      ["Russell Okung", "OL", "Veteran blindside tackle", 88, 90, 84, 88],
+      ["Antonio Gates", "TE", "Late-prime red-zone TE", 91, 93, 90, 91]
+    ]
+  },
+  {
+    team: "Tennessee Titans",
+    decade: "2000s",
+    cards: [
+      ["Vince Young", "QB", "Rookie-year playmaker", 86, 88, 88, 84],
+      ["Chris Johnson", "RB", "2,000-yard speed demon", 98, 100, 98, 87],
+      ["Derrick Mason", "WR", "Early-decade separator", 88, 90, 84, 91],
+      ["Kenny Britt", "WR", "Big-play target", 83, 86, 82, 82],
+      ["Michael Roos", "OL", "All-Pro left tackle", 92, 94, 88, 91],
+      ["Bo Scaife", "TE", "Move tight end", 82, 84, 78, 86]
+    ]
+  },
+  {
+    team: "Houston Texans",
+    decade: "2000s",
+    cards: [
+      ["Matt Schaub", "QB", "Play-action volume passer", 87, 90, 84, 88],
+      ["Domanick Williams", "RB", "Early franchise back", 84, 87, 80, 85],
+      ["Andre Johnson", "WR", "Prime physical WR1", 97, 99, 96, 90],
+      ["Kevin Walter", "WR", "Steady possession WR", 83, 85, 79, 87],
+      ["Eric Winston", "OL", "Reliable right tackle", 86, 88, 82, 88],
+      ["Owen Daniels", "TE", "Pro Bowl tight end", 87, 89, 83, 89]
+    ]
+  },
+  {
+    team: "Jacksonville Jaguars",
+    decade: "2000s",
+    cards: [
+      ["David Garrard", "QB", "Efficient playoff passer", 86, 89, 84, 88],
+      ["Maurice Jones-Drew", "RB", "Compact scoring engine", 95, 97, 94, 90],
+      ["Jimmy Smith", "WR", "Early-decade route star", 91, 93, 88, 91],
+      ["Keenan McCardell", "WR", "Veteran chain mover", 86, 88, 82, 89],
+      ["Brad Meester", "OL", "Long-time center", 86, 88, 82, 90],
+      ["Marcedes Lewis", "TE", "Complete tight end", 86, 88, 82, 89]
+    ]
   }
 ];
 
