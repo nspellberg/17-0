@@ -622,7 +622,7 @@ function getScore(roster: (Player | null)[]) {
 }
 
 function canFill(slot: Position, player: Player) {
-  return (slot === "FLEX" && player.position !== "DEF") || slot === player.position;
+  return (slot === "FLEX" && player.position !== "DEF" && player.position !== "QB") || slot === player.position;
 }
 
 function ratingTone(rating: number) {
@@ -696,6 +696,8 @@ export default function Home() {
   const [teamRefreshUsed, setTeamRefreshUsed] = useState(false);
   const [decadeRefreshUsed, setDecadeRefreshUsed] = useState(false);
   const [rolledTeams, setRolledTeams] = useState<string[]>([]);
+  const [resultsUnlocked, setResultsUnlocked] = useState(false);
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
 
   const round = Math.min(drafted.length + 1, rosterSlots.length);
   const score = useMemo(() => getScore(roster), [roster]);
@@ -735,6 +737,8 @@ export default function Home() {
     setTeamRefreshUsed(false);
     setDecadeRefreshUsed(false);
     setRolledTeams([]);
+    setResultsUnlocked(false);
+    setShareStatus("idle");
     setScreen(useExample ? "rating" : "draft");
   }
 
@@ -775,6 +779,38 @@ export default function Home() {
     }
     setCurrentSpin(null);
     if (drafted.length + 1 >= rosterSlots.length) setScreen("rating");
+  }
+
+  function goToResults() {
+    setResultsUnlocked(true);
+    setScreen("results");
+  }
+
+  async function shareTeam() {
+    const rosterText = rosterSlots
+      .map((slot, index) => {
+        const player = roster[index];
+        return `${slot}: ${player ? `${player.name} (${player.team}, ${player.decade})` : "Empty"}`;
+      })
+      .join("\n");
+    const text = `My 17-0 draft team went ${score.wins}-${score.losses}!\n\n${rosterText}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "My 17-0 team", text });
+        return;
+      }
+
+      await navigator.clipboard?.writeText(text);
+      setShareStatus("copied");
+      window.setTimeout(() => setShareStatus("idle"), 1800);
+    } catch {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+        setShareStatus("copied");
+        window.setTimeout(() => setShareStatus("idle"), 1800);
+      }
+    }
   }
 
   const navItems: { key: Screen; label: string }[] = [
@@ -890,7 +926,8 @@ export default function Home() {
                 complete={isRosterComplete}
                 showProjection={showProjection}
                 onToggleProjection={() => setShowProjection((value) => !value)}
-                onReveal={() => setScreen("rating")}
+                onReveal={() => setScreen(resultsUnlocked ? "results" : "rating")}
+                revealLabel={resultsUnlocked ? "Back to Results" : undefined}
               />
               <LiveLineup roster={roster} />
             </div>
@@ -919,7 +956,8 @@ export default function Home() {
               complete={isRosterComplete}
               showProjection={showProjection}
               onToggleProjection={() => setShowProjection((value) => !value)}
-              onReveal={() => setScreen("rating")}
+              onReveal={() => setScreen(resultsUnlocked ? "results" : "rating")}
+              revealLabel={resultsUnlocked ? "Back to Results" : undefined}
             />
             <LiveLineup roster={roster} />
           </aside>
@@ -932,7 +970,7 @@ export default function Home() {
             <p className="eyebrow">Predicted final record</p>
             <strong>{score.wins}-{score.losses}</strong>
             <span>{score.wins === 17 ? "Undefeated profile" : score.wins >= 14 ? "Championship contender" : "Playoff-caliber build"}</span>
-            <button className="primary-cta" onClick={() => setScreen("results")}>Final Reveal</button>
+            <button className="primary-cta" onClick={goToResults}>Final Reveal</button>
           </div>
           <div className="rating-board">
             <RatingBar label="Overall Team Score" value={score.overall} />
@@ -955,7 +993,7 @@ export default function Home() {
           <div className="trophy" aria-hidden="true" />
           <div className="result-actions">
             <button className="primary-cta" onClick={() => resetGame(false)}>Draft Again</button>
-            <button className="secondary-cta" onClick={() => navigator.clipboard?.writeText(`My 17-0 draft team went ${score.wins}-${score.losses}!`)}>Share</button>
+            <button className="secondary-cta" onClick={() => void shareTeam()}>{shareStatus === "copied" ? "Copied Lineup" : "Share Lineup"}</button>
             <button className="secondary-cta" onClick={() => setSaved(true)}>{saved ? "Team Saved" : "Save Team"}</button>
             <button className="secondary-cta" onClick={() => setScreen("draft")}>View Lineup</button>
           </div>
@@ -1011,7 +1049,8 @@ function ProgressPanel({
   complete,
   showProjection,
   onToggleProjection,
-  onReveal
+  onReveal,
+  revealLabel
 }: {
   drafted: number;
   score: ReturnType<typeof getScore>;
@@ -1019,6 +1058,7 @@ function ProgressPanel({
   showProjection: boolean;
   onToggleProjection: () => void;
   onReveal: () => void;
+  revealLabel?: string;
 }) {
   return (
     <div className="progress-panel">
@@ -1034,7 +1074,7 @@ function ProgressPanel({
         {showProjection ? "Hide Projection" : "Peek at Projection"}
       </button>
       <RatingBar label="Roster filled" value={Math.round((drafted / rosterSlots.length) * 100)} />
-      <button className="secondary-cta full" disabled={!complete} onClick={onReveal}>{complete ? "Reveal Record" : "Keep Drafting"}</button>
+      <button className="secondary-cta full" disabled={!complete} onClick={onReveal}>{complete ? revealLabel || "Reveal Record" : "Keep Drafting"}</button>
     </div>
   );
 }
