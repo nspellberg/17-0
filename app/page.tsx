@@ -790,6 +790,19 @@ const expandedOffensePlayers: Player[] = expandedRosterSeeds.flatMap(({ team, de
   }))
 );
 
+const journeymanPlayers: Player[] = [
+  { id: "josh-johnson-bucs-2000s", name: "Josh Johnson", team: "Tampa Bay Buccaneers", decade: "2000s", position: "QB", stats: "Athletic developmental QB", rating: 74, offense: 78, defense: 28, star: 70, chemistry: 78 },
+  { id: "josh-johnson-washington-2010s", name: "Josh Johnson", team: "Washington Commanders", decade: "2010s", position: "QB", stats: "Late-season dual-threat spark", rating: 76, offense: 80, defense: 28, star: 72, chemistry: 82 },
+  { id: "josh-johnson-ravens-2010s", name: "Josh Johnson", team: "Baltimore Ravens", decade: "2010s", position: "QB", stats: "Emergency mobile passer", rating: 73, offense: 77, defense: 28, star: 69, chemistry: 80 },
+  { id: "ryan-fitzpatrick-texans-2010s", name: "Ryan Fitzpatrick", team: "Houston Texans", decade: "2010s", position: "QB", stats: "Fearless gunslinger cameo", rating: 82, offense: 85, defense: 28, star: 82, chemistry: 80 },
+  { id: "josh-mccown-cardinals-2000s", name: "Josh McCown", team: "Arizona Cardinals", decade: "2000s", position: "QB", stats: "Young scramble-pass starter", rating: 77, offense: 80, defense: 28, star: 73, chemistry: 79 },
+  { id: "teddy-bridgewater-saints-2010s", name: "Teddy Bridgewater", team: "New Orleans Saints", decade: "2010s", position: "QB", stats: "Efficient spot-start winner", rating: 84, offense: 86, defense: 28, star: 80, chemistry: 90 },
+  { id: "geno-smith-seahawks-2010s", name: "Geno Smith", team: "Seattle Seahawks", decade: "2010s", position: "QB", stats: "Backup reset before breakout", rating: 76, offense: 79, defense: 28, star: 72, chemistry: 82 },
+  { id: "michael-vick-eagles-2000s", name: "Michael Vick", team: "Philadelphia Eagles", decade: "2000s", position: "QB", stats: "Explosive late-decade reset", rating: 83, offense: 87, defense: 28, star: 90, chemistry: 76 },
+  { id: "taysom-hill-saints-2010s", name: "Taysom Hill", team: "New Orleans Saints", decade: "2010s", position: "FLEX", stats: "QB/RB/TE gadget weapon", rating: 86, offense: 89, defense: 42, star: 84, chemistry: 91 },
+  { id: "tyrod-taylor-ravens-2010s", name: "Tyrod Taylor", team: "Baltimore Ravens", decade: "2010s", position: "QB", stats: "Mobile backup with playoff legs", rating: 78, offense: 82, defense: 28, star: 76, chemistry: 84 }
+];
+
 const defenseRatings: Record<string, Pick<Player, "rating" | "offense" | "defense" | "star" | "chemistry" | "stats">> = {
   "Dallas Cowboys-1990s": { rating: 93, offense: 35, defense: 95, star: 92, chemistry: 95, stats: "Fast, physical championship defense" },
   "San Francisco 49ers-1980s": { rating: 92, offense: 34, defense: 94, star: 91, chemistry: 96, stats: "Balanced title-era unit" },
@@ -807,7 +820,7 @@ const defenseRatings: Record<string, Pick<Player, "rating" | "offense" | "defens
   "Las Vegas Raiders-1970s": { rating: 93, offense: 33, defense: 95, star: 92, chemistry: 95, stats: "Hard-hitting title-era defense" }
 };
 
-const offensePlayers = [...players, ...offenseRosterAddons, ...expandedOffensePlayers].filter((player) => offensePositions.includes(player.position));
+const offensePlayers = [...players, ...offenseRosterAddons, ...expandedOffensePlayers, ...journeymanPlayers].filter((player) => offensePositions.includes(player.position));
 
 function slugify(value: string) {
   return value.toLowerCase().replaceAll(" ", "-");
@@ -988,8 +1001,8 @@ function getPlayerMetrics(player: Player) {
 
   if (player.position === "OL") {
     return [
-      { label: "Sacks", value: `${clampStat(9 - (player.offense - 84) * 0.16, 2, 9)}` },
-      { label: "Run", value: `${clampStat(player.offense, 80, 99)}` }
+      { label: "Pass Blk", value: `${clampStat(player.offense - 1, 75, 99)}` },
+      { label: "Run Blk", value: `${clampStat(player.offense, 75, 99)}` }
     ];
   }
 
