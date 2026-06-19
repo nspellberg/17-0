@@ -1155,14 +1155,14 @@ export default function Home() {
   }
 
   async function shareTeam() {
-    const shareUrl = typeof window !== "undefined" ? window.location.origin : "https://17-0-ruby.vercel.app";
+    const shareUrl = "https://17-0.io";
     const rosterText = rosterSlots
       .map((slot, index) => {
         const player = roster[index];
         return `${slot}: ${player ? `${player.name} (${player.team}, ${player.decade})` : "Empty"}`;
       })
       .join("\n");
-    const text = `My 17-0 draft team went ${score.wins}-${score.losses}.\nCan you beat it?\n\n${rosterText}\n\nPlay 17-0: ${shareUrl}`;
+    const text = `My 17-0 draft team went ${score.wins}-${score.losses}.\nCan you beat it?\n\n${rosterText}\n\nPlay 17-0:\n17-0.io`;
 
     try {
       if (navigator.share) {
@@ -1323,8 +1323,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="spin-actions">
-                <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || drafted.length >= rosterSlots.length}>
-                  Spin Team + Decade
+                <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || !!currentSpin || drafted.length >= rosterSlots.length}>
+                  {currentSpin ? "Draft From This Roll" : "Spin Team + Decade"}
                 </button>
                 <div className="reroll-actions">
                   <button className="secondary-cta" onClick={refreshTeam} disabled={!currentSpin || teamRefreshUsed || !teamRefreshOptions.length || isSpinning || drafted.length >= rosterSlots.length}>
