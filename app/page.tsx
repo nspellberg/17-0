@@ -1035,21 +1035,26 @@ export default function Home() {
 
   const round = Math.min(drafted.length + 1, rosterSlots.length);
   const score = useMemo(() => getScore(roster), [roster]);
-  const unusedSpinDeck = spinDeck.filter((spin) => !rolledTeams.includes(spin.team));
-  const offenseOptions = currentSpin
-    ? offensePlayers.filter((player) => player.team === currentSpin.team && player.decade === currentSpin.decade)
-    : [];
-  const availablePlayers = currentSpin
-    ? [...offenseOptions, getTeamDefense(currentSpin)].filter((player) => !drafted.some((draftedPlayer) => draftedPlayer.id === player.id))
-    : [];
-  const teamRefreshOptions = currentSpin
-    ? spinDeck.filter((spin) => spin.decade === currentSpin.decade && spin.team !== currentSpin.team && !rolledTeams.includes(spin.team))
-    : [];
-  const decadeRefreshOptions = currentSpin
-    ? spinDeck.filter((spin) => spin.team === currentSpin.team && spin.decade !== currentSpin.decade)
-    : [];
   const isRosterComplete = roster.every(Boolean);
   const hasOpenSlot = (player: Player) => roster.some((slotPlayer, index) => !slotPlayer && canFill(rosterSlots[index], player));
+  const isUndrafted = (player: Player) => !drafted.some((draftedPlayer) => draftedPlayer.id === player.id);
+  const getSpinOptions = (spin: Spin) => [
+    ...offensePlayers.filter((player) => player.team === spin.team && player.decade === spin.decade),
+    getTeamDefense(spin)
+  ];
+  const spinHasDraftableOption = (spin: Spin) => getSpinOptions(spin).some((player) => isUndrafted(player) && hasOpenSlot(player));
+  const viableSpinDeck = spinDeck.filter(spinHasDraftableOption);
+  const unusedSpinDeck = viableSpinDeck.filter((spin) => !rolledTeams.includes(spin.team));
+  const spinChoices = unusedSpinDeck.length ? unusedSpinDeck : viableSpinDeck;
+  const availablePlayers = currentSpin
+    ? getSpinOptions(currentSpin).filter(isUndrafted)
+    : [];
+  const teamRefreshOptions = currentSpin
+    ? spinDeck.filter((spin) => spin.decade === currentSpin.decade && spin.team !== currentSpin.team && !rolledTeams.includes(spin.team) && spinHasDraftableOption(spin))
+    : [];
+  const decadeRefreshOptions = currentSpin
+    ? spinDeck.filter((spin) => spin.team === currentSpin.team && spin.decade !== currentSpin.decade && spinHasDraftableOption(spin))
+    : [];
 
   function resetGame(useExample = false, source = "button") {
     const nextRoster = Array(rosterSlots.length).fill(null) as (Player | null)[];
@@ -1083,9 +1088,10 @@ export default function Home() {
   }
 
   function spinTeam() {
+    if (!spinChoices.length) return;
     setIsSpinning(true);
     window.setTimeout(() => {
-      const nextSpin = randomFrom(unusedSpinDeck.length ? unusedSpinDeck : spinDeck);
+      const nextSpin = randomFrom(spinChoices);
       revealSpin(nextSpin);
       setIsSpinning(false);
       trackGameEvent("Team Decade Spun", {
@@ -1336,8 +1342,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="spin-actions">
-                <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || !!currentSpin || drafted.length >= rosterSlots.length}>
-                  {currentSpin ? "Draft From This Roll" : "Spin Team + Decade"}
+                <button className="primary-cta" onClick={spinTeam} disabled={isSpinning || !!currentSpin || drafted.length >= rosterSlots.length || !spinChoices.length}>
+                  {currentSpin ? "Draft From This Roll" : spinChoices.length ? "Spin Team + Decade" : "No Valid Rolls"}
                 </button>
                 <div className="reroll-actions">
                   <button className="secondary-cta" onClick={refreshTeam} disabled={!currentSpin || teamRefreshUsed || !teamRefreshOptions.length || isSpinning || drafted.length >= rosterSlots.length}>
