@@ -926,7 +926,7 @@ function getScore(roster: (Player | null)[]) {
   const overall = averageRating * 0.3 + offense * 0.22 + defense * 0.14 + star * 0.14 + balance * 0.11 + chemistry * 0.09;
   const completeBonus = filled.length === rosterSlots.length ? 3 : 0;
   const rawWins = Math.round((overall + completeBonus - 70) / 2.25);
-  let wins = Math.max(0, Math.min(16, rawWins));
+  let wins = Math.max(0, Math.min(14, rawWins));
 
   if (
     filled.length === rosterSlots.length &&
@@ -939,8 +939,20 @@ function getScore(roster: (Player | null)[]) {
     chemistry >= 94
   ) {
     wins = 17;
+  } else if (
+    overall >= 96.5 &&
+    averageRating >= 95.5 &&
+    offense >= 96.5 &&
+    defense >= 92 &&
+    star >= 95.5 &&
+    balance >= 94 &&
+    chemistry >= 93
+  ) {
+    wins = 16;
   } else if (overall >= 95 && offense >= 96 && defense >= 90 && star >= 94 && balance >= 92 && chemistry >= 92) {
     wins = Math.max(wins, 15);
+  } else if (overall >= 94 && offense >= 95 && defense >= 89 && star >= 93 && balance >= 91 && chemistry >= 91) {
+    wins = Math.max(wins, 14);
   }
 
   return {
