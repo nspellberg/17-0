@@ -1164,10 +1164,12 @@ export default function Home() {
     });
     if (nextDraftedCount >= rosterSlots.length) {
       trackGameEvent("Draft Completed", {
-        wins: nextScore.wins,
-        losses: nextScore.losses,
+        record: `${nextScore.wins}-${nextScore.losses}`,
         perfect: nextScore.wins === 17
       });
+      if (nextScore.wins === 17) {
+        trackGameEvent("Perfect Season Earned");
+      }
       setScreen("rating");
     }
   }
