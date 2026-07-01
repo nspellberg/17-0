@@ -930,23 +930,23 @@ function getScore(roster: (Player | null)[]) {
 
   if (
     filled.length === rosterSlots.length &&
-    overall >= 97.5 &&
-    averageRating >= 96.5 &&
-    offense >= 97.2 &&
-    defense >= 94 &&
-    star >= 96.5 &&
+    overall >= 97.8 &&
+    averageRating >= 96.8 &&
+    offense >= 97.5 &&
+    defense >= 95 &&
+    star >= 96.8 &&
     balance >= 95 &&
-    chemistry >= 94
+    chemistry >= 94.5
   ) {
     wins = 17;
   } else if (
-    overall >= 96.5 &&
-    averageRating >= 95.5 &&
-    offense >= 96.5 &&
-    defense >= 92 &&
-    star >= 95.5 &&
+    overall >= 96.8 &&
+    averageRating >= 95.8 &&
+    offense >= 96.8 &&
+    defense >= 93 &&
+    star >= 95.8 &&
     balance >= 94 &&
-    chemistry >= 93
+    chemistry >= 93.5
   ) {
     wins = 16;
   } else if (overall >= 95 && offense >= 96 && defense >= 90 && star >= 94 && balance >= 92 && chemistry >= 92) {
